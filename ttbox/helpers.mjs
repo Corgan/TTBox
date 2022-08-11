@@ -1,14 +1,11 @@
 let ttPromise = false;
 const getTT = async () => {
-    let tt = (await (new Promise(resolve => nw.Window.getAll(a => resolve(a))))).find(w => w.window.location.href.match("ttbox/tt.html"));
-    
-    let baseDir = document.getElementById('TTBox-Script').src;
-    baseDir = baseDir.slice(0, baseDir.indexOf('/ttbox/ttbox.mjs'));
+    let tt = (await (new Promise(resolve => nw.Window.getAll(a => resolve(a))))).find(w => w.window.location.href.match("/mods/ttbox/tt.html"));
 
     if(tt === undefined) {
         if(!ttPromise) {
             ttPromise = new Promise((resolve) => {
-                nw.Window.open(baseDir + '/ttbox/tt.html', { frame: false, transparent: true, show: true }, (w) => {
+                nw.Window.open('/mods/ttbox/tt.html', { frame: false, transparent: true, show: true }, (w) => {
                     w.moveTo(9999, 9999);
                     w.on('loaded', async () => {
                         resolve(w);
