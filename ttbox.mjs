@@ -12,15 +12,4 @@ const getToolbox = async function() {
 
     return toolboxWindow;
 }
-
-const updateData = function() {
-    if(window.game) {
-        window.isSaving = true;
-        global.game_data = JSON.parse(JSON.stringify(window.game));
-        window.isSaving = false;
-    }
-    requestAnimationFrame(updateData);
-}
-
-updateData();
 await getToolbox();

@@ -1,6 +1,6 @@
-let script = document.createElement('script');
-script.id = 'TTBox-Script';
-script.src = '/mods/ttbox.mjs';
-script.type = 'module';
-script.setAttribute('crossorigin', 'anonymous');
-document.head.appendChild(script);
+let toolbox = document.createElement('script');
+toolbox.id = 'TTBox-Script';
+toolbox.src = '/mods/ttbox.mjs';
+toolbox.type = 'module';
+toolbox.setAttribute('crossorigin', 'anonymous');
+document.head.appendChild(toolbox);
