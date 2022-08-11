@@ -102,13 +102,16 @@ export default class VoidsBlock extends StatBlock {
 
         this.maps.forEach((map) => {
             let [ prefix, suffix, stack, he ] = map.$el.children;
-            stack.textContent = map && map.stacked ? map.stacked : 0;
+            stack.textContent = map.stacked != undefined ? map.stacked ? map.stacked+1 : 1 : 0;
             //map.$el.classList.toggle('hide', !map || map.stacked == 0);
             let helium = 0;
-            if(map && map.stacked > 0) {
+            if(map.stacked != undefined) {
                 helium += this.helium_from_cthulimp(world);
-                helium += this.helium_from_cthulimp(world, true, map.stacked);
-                totals.stacks += map.stacked;
+                totals.stacks += 1;
+                if(map.stacked > 0) {
+                    helium += this.helium_from_cthulimp(world, true, map.stacked);
+                    totals.stacks += map.stacked;
+                }
                 totals.he += helium;
             }
             he.textContent = gameWindow.prettify(helium);
@@ -233,7 +236,7 @@ export default class VoidsBlock extends StatBlock {
     names = this.suffixes.flatMap(suffix => this.prefixes.map(prefix => `${prefix} ${suffix}`));
     get maps() {
         return this.names.map(name => {
-            let map = game.global.mapsOwnedArray.find(owned => owned.name == name) || { name: name, stacked: 0 };
+            let map = game.global.mapsOwnedArray.find(owned => owned.name == name) || { name: name };
             let $el = this.$vms.find(node => node.id == `void-vm-${name.toLowerCase().replace(' ', '-')}`) || false;
             return {
                 ...map,
