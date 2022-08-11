@@ -3,91 +3,35 @@ export default {
   locked: false,
   blocks: [
     {
-      id: "voids",
-      title: "Voids",
-      x: 49,
-      y: 1,
-      w: 30,
-      h: 45,
-      z: 0,
-      collapsed: false,
-      type: "VoidsBlock"
-    },
-    {
       id: "daily",
       title: "Daily Status",
       x: 1,
       y: 1,
-      w: 48,
+      w: 43,
       h: 8,
-      z: 1,
+      z: 0,
       collapsed: false,
       type: "DailyBlock"
     },
     {
-      id: "heirlooms",
-      title: "Heirlooms",
-      x: 1,
-      y: 9,
-      w: 22,
-      h: 19,
-      z: 2,
+      id: "voids",
+      title: "Voids",
+      x: 44,
+      y: 1,
+      w: 30,
+      h: 45,
+      z: 1,
       collapsed: false,
-      type: "HeirloomsBlock"
-    },
-    {
-      id: "playerspire",
-      title: "Player Spire",
-      x: 23,
-      y: 9,
-      w: 15,
-      h: 25,
-      z: 3,
-      collapsed: false,
-      type: "PlayerSpireBlock"
-    },
-    {
-      id: "bw",
-      title: "Bionics",
-      x: 38,
-      y: 9,
-      w: 11,
-      h: 10,
-      z: 4,
-      collapsed: false,
-      type: "BionicMapBlock"
-    },
-    {
-      id: "test",
-      title: "Test",
-      x: 38,
-      y: 19,
-      w: 8,
-      h: 6,
-      z: 5,
-      collapsed: true,
-      type: "TextBlock",
-      text: "Testing"
-    },
-    {
-      id: "maps",
-      title: "Prestige Items",
-      x: 1,
-      y: 28,
-      w: 21,
-      h: 29,
-      z: 6,
-      collapsed: false,
-      type: "MapsBlock"
+      type: "VoidsBlock"
     },
     {
       id: "run",
       title: "Current Run",
       x: 1,
-      y: 57,
-      w: 42,
+      y: 46,
+      w: 43,
       h: 25,
-      z: 7,
+      z: 2,
       collapsed: false,
       type: "InfoBlock",
       props: [
@@ -111,13 +55,24 @@ export default {
       ]
     },
     {
+      id: "playerspire",
+      title: "Player Spire",
+      x: 74,
+      y: 1,
+      w: 15,
+      h: 45,
+      z: 3,
+      collapsed: false,
+      type: "PlayerSpireBlock"
+    },
+    {
       id: "info",
       title: "Info",
-      x: 43,
-      y: 57,
-      w: 36,
+      x: 44,
+      y: 46,
+      w: 45,
       h: 25,
-      z: 9,
+      z: 4,
       collapsed: false,
       type: "InfoBlock",
       props: [
@@ -136,6 +91,51 @@ export default {
         "de",
         "next-talent"
       ]
+    },
+    {
+      id: "bw",
+      title: "Bionics",
+      x: 1,
+      y: 37,
+      w: 11,
+      h: 9,
+      z: 5,
+      collapsed: false,
+      type: "BionicMapBlock"
+    },
+    {
+      id: "heirlooms",
+      title: "Heirlooms",
+      x: 1,
+      y: 9,
+      w: 23,
+      h: 28,
+      z: 6,
+      collapsed: false,
+      type: "HeirloomsBlock"
+    },
+    {
+      id: "test",
+      title: "Test",
+      x: 12,
+      y: 37,
+      w: 12,
+      h: 9,
+      z: 7,
+      collapsed: false,
+      type: "TextBlock",
+      text: "Testing"
+    },
+    {
+      id: "maps",
+      title: "Prestige Items",
+      x: 24,
+      y: 9,
+      w: 20,
+      h: 37,
+      z: 9,
+      collapsed: false,
+      type: "MapsBlock"
     }
   ]
 }
