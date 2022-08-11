@@ -103,6 +103,8 @@ export default class InfoBlock extends StatBlock {
         { id: "scry-cells", name: "Scry Cells", fn: () => [...new Array(100).keys()].map(x => gameWindow.getRandomIntSeeded(game.global.scrySeed + (x + 1) - (game.global.lastClearedCell + 1), 0, 100)).map((x, i) => x <= 52 && x >= 50 ? i : 0).filter(Boolean).join(', ') },
         { id: "fluff-dmg", name: "Fluff %", fn: () => gameWindow.prettify((gameWindow.Fluffy.getDamageModifier() - 1) * 100) },
         { id: "run-xp", name: "Run XP", fn: () => {
+            if(!gameWindow.getPageSetting)
+                return 'Requires AT';
 
             let minZone = 300;
             if (gameWindow.getPerkLevel("Classy"))

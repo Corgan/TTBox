@@ -67,7 +67,15 @@ export default class BlockManager {
 
 
         this.$pin.classList.toggle('on', this.ontop);
-        this.$pauseAT.classList.toggle('on', !gameWindow.getPageSetting("PauseScript"));
+        if(gameWindow.getPageSetting) {
+            this.$pauseAT.classList.toggle('on', !gameWindow.getPageSetting("PauseScript"));
+            this.$pauseAT.addEventListener('click', () => {
+                gameWindow.settingChanged("PauseScript");
+                this.$pauseAT.classList.toggle('on', !gameWindow.getPageSetting("PauseScript"));
+            });
+        } else {
+            this.$pauseAT.classList.add('hide');
+        }
 
         gameWindow.swapClass('icon-', game.options.menu.pauseGame.enabled ? "icon-play4" : "icon-pause3", this.$pause);
         gameWindow.swapClass('icon-', this.locked ? "icon-lock" : "icon-lock-open", this.$lock);
@@ -79,10 +87,6 @@ export default class BlockManager {
             this.ontop = !this.ontop;
             win.setAlwaysOnTop(this.ontop);
             this.$pin.classList.toggle('on', this.ontop);
-        });
-        this.$pauseAT.addEventListener('click', () => {
-            gameWindow.settingChanged("PauseScript");
-            this.$pauseAT.classList.toggle('on', !gameWindow.getPageSetting("PauseScript"));
         });
         this.$pause.addEventListener('click', () => {
             gameWindow.toggleSetting('pauseGame');

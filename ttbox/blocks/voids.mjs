@@ -86,7 +86,7 @@ export default class VoidsBlock extends StatBlock {
     update() {
         super.update();
 
-        let world = gameWindow.getPageSetting('VoidMaps') > 0 && gameWindow.getPageSetting('VoidMaps') >= game.global.world ? gameWindow.getPageSetting('VoidMaps') : game.global.world;
+        let world = gameWindow.getPageSetting && gameWindow.getPageSetting('VoidMaps') > 0 && gameWindow.getPageSetting('VoidMaps') >= game.global.world ? gameWindow.getPageSetting('VoidMaps') : game.global.world;
         //world = game.global.world;
 
         this.$header.children[3].textContent = `He @ ${world}`;
