@@ -5,7 +5,7 @@ const getToolbox = async function() {
 
     if(toolboxWindow === undefined) {
         toolboxWindow = await (new Promise((resolve) => {
-            nw.Window.open(baseDir + '/ttbox/ttbox.html', { id: "ttbox", frame: false }, (w) => {
+            nw.Window.open(baseDir + '/ttbox/ttbox.html', { id: "ttbox", frame: false, new_instance: true, mixed_context: true }, (w) => {
                 w.on('loaded', () => resolve(w));
                 w.on('close', () => { });
             });
