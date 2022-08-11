@@ -5,9 +5,9 @@ class TTBox {
     static instance = new this();
 
     static modules = [
-        'sim',
-        'utils',
-        'maps',
+        //'sim',
+        //'utils',
+        //'maps',
     ];
 
     static {
@@ -16,7 +16,7 @@ class TTBox {
                 await promise;
                 return this.instance.loadModule(current);
             }, Promise.resolve());
-            await this.instance.start();
+            //await this.instance.start();
         })();
     };
 
