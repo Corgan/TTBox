@@ -1,0 +1,81 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
+        <link rel="stylesheet" type="text/css" href="/fonts/icomoon/style.css">
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <link rel="stylesheet" type="text/css" href="/mods/ttbox/ttbox.css">
+        <link rel="stylesheet" type="text/css" href="/mods/mods.css">
+        <script id="TTBox-Script" src="ttbox.mjs" type="module" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="titlebar">
+                <div class="left">
+                    <span id="pauseAT" class="icon-tools2 toggle"></span>
+                    <span id="pause" class="icon-play4"></span>
+                    <span id="lock" class="icon-lock-open"></span>
+                </div>
+                <div class="center">
+                    <span id="title">Trimp Toolbox</span>
+                </div>
+                <div class="right">
+                    <span id="pin" class="icon-pushpin toggle"></span>
+                    <span id="dev" class="icon-bug"></span>
+                    <span id="reload" class="icon-refresh"></span>
+                </div>
+            </div>
+            <div id="content">
+            </div>
+        </div>
+        <script type="text/javascript">
+            const mObserver = new MutationObserver(() => {
+                let win = nw.Window.get();
+                let contentWidth = document.getElementById('content').offsetWidth;
+                let contentHeight = document.getElementById('titlebar').offsetHeight + document.getElementById('content').offsetHeight;
+
+                if(contentWidth > win.width)
+                    win.resizeTo(contentWidth, win.height);
+                if(contentHeight > win.height)
+                    win.resizeTo(win.width, contentHeight);
+
+                win.setMinimumSize(contentWidth, contentHeight);
+            });
+            mObserver.observe(document.body, {attributes: true, childList: true, subtree: true});
+            
+
+        </script>
+        <script type="module">
+            import { getTT } from './helpers.mjs';
+            import BlockManager from './block_manager.mjs';
+            import EventManager from './event_manager.mjs';
+
+            import BionicMapBlock from './blocks/bw.mjs';
+            import DailyBlock from './blocks/daily.mjs';
+            import HeirloomsBlock from './blocks/heirlooms.mjs';
+            import InfoBlock from './blocks/info.mjs';
+            import MapsBlock from './blocks/maps.mjs';
+            import PlayerSpireBlock from './blocks/playerspire.mjs';
+            import TextBlock from './blocks/text.mjs';
+            import VoidsBlock from './blocks/voids.mjs';
+
+            let gameWindow = (await (new Promise(resolve => nw.Window.getAll(a => resolve(a))))).find(w => w.window.location.href.match("/index.html")).window;
+
+            Object.defineProperty(window, 'game', {
+                enumerable: false,
+                get: () => gameWindow.game
+            });
+
+            Object.defineProperty(window, 'gameWindow', {
+                enumerable: false,
+                get: () => gameWindow
+            });
+            
+            (await getTT()).window.location.reload();
+
+            EventManager.start(await getTT());
+            BlockManager.start();
+            window.BlockManager = BlockManager;
+            window.addEventListener('beforeunload', (e) => BlockManager.save());
+        </script>
+    </body>
+</html>

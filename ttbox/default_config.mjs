@@ -1,0 +1,141 @@
+export default {
+    ontop: false,
+    locked: false,
+    blocks: [
+      {
+        id: "playerspire",
+        title: "Player Spire",
+        x: 57,
+        y: 20,
+        w: 15,
+        h: 25,
+        z: 0,
+        collapsed: false,
+        type: "PlayerSpireBlock"
+      },
+      {
+        id: "maps",
+        title: "Prestige Items",
+        x: 1,
+        y: 9,
+        w: 21,
+        h: 29,
+        z: 1,
+        collapsed: false,
+        type: "MapsBlock"
+      },
+      {
+        id: "run",
+        title: "Current Run",
+        x: 1,
+        y: 38,
+        w: 41,
+        h: 25,
+        z: 9,
+        collapsed: false,
+        type: "InfoBlock",
+        props: [
+          "rtime",
+          "zone",
+          "ztime",
+          "cell",
+          "mtime",
+          "r-he",
+          "vms",
+          "fluffxp",
+          "scry-left",
+          "de-drop",
+          "zone-emp",
+          "uber-emp",
+          "population",
+          "breed-time",
+          "gator-next",
+          "gators",
+          "gator-ratio"
+        ]
+      },
+      {
+        id: "info",
+        title: "Info",
+        x: 42,
+        y: 46,
+        w: 36,
+        h: 20,
+        z: 3,
+        collapsed: false,
+        type: "InfoBlock",
+        props: [
+          "hze",
+          "liq",
+          "t-he",
+          "nu",
+          "spent",
+          "ss",
+          "avail",
+          "magmite",
+          "c2",
+          "bones",
+          "achieve",
+          "fluffy",
+          "de",
+          "next-talent"
+        ]
+      },
+      {
+        id: "heirlooms",
+        title: "Heirlooms",
+        x: 22,
+        y: 9,
+        w: 22,
+        h: 19,
+        z: 4,
+        collapsed: false,
+        type: "HeirloomsBlock"
+      },
+      {
+        id: "voids",
+        title: "Voids",
+        x: 44,
+        y: 1,
+        w: 30,
+        h: 45,
+        z: 5,
+        collapsed: false,
+        type: "VoidsBlock"
+      },
+      {
+        id: "daily",
+        title: "Daily Status",
+        x: 1,
+        y: 1,
+        w: 43,
+        h: 8,
+        z: 6,
+        collapsed: false,
+        type: "DailyBlock"
+      },
+      {
+        id: "bw",
+        title: "Bionics",
+        x: 22,
+        y: 28,
+        w: 12,
+        h: 10,
+        z: 7,
+        collapsed: false,
+        type: "BionicMapBlock"
+      },
+      {
+        id: "test",
+        title: "Test",
+        x: 34,
+        y: 28,
+        w: 8,
+        h: 6,
+        z: 8,
+        collapsed: true,
+        type: "TextBlock",
+        text: "Testing"
+      }
+    ]
+  }

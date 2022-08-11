@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
+        <link rel="stylesheet" type="text/css" href="/fonts/icomoon/style.css">
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <link rel="stylesheet" type="text/css" href="/mods/mods.css">
+        <style>
+            body {
+                background-color: transparent;
+            }
+            #content {
+                border-radius: 10px;
+                padding: 5px;
+                color: white;
+                width: max-content;
+                max-width: 500px;
+            }
+
+            ul {
+                background: black;
+            }
+
+            .selectedHeirloomItem {
+                font-size: 20px;
+                border: 3px solid #555;
+                padding: 6px;
+                padding-left: 20px;
+                text-align: left;
+                background-color: #111111;
+            }
+
+            .selectedHeirloomIcon {
+                font-size: 40px;
+                text-align: center;
+                line-height: 30px;
+            }
+
+            #selectedHeirloomTitle {
+                font-size: 40px;
+            }
+
+            .selectedHeirloomRow {
+                margin-bottom: 0.4vw;
+            }
+
+            .heirloomMod {
+                cursor: pointer;
+                padding: 3px 6px 3px 6px;
+                border: 3px solid #333;
+                background-color: #222;
+                border-radius: 40px;
+                margin-bottom: 4px;
+                display: inline-block;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="content">
+
+        </div>
+        <script type="text/javascript">
+            function debounce(func, timeout = 300){
+                let timer;
+                return (...args) => {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+                };
+            }
+
+            const fitContent = function() {
+                let win = nw.Window.get();
+                let contentWidth = document.getElementById('content').offsetWidth;
+                let contentHeight = document.getElementById('content').offsetHeight;
+
+                win.resizeTo(contentWidth, contentHeight);
+                win.setShowInTaskbar(false);
+                win.setAlwaysOnTop(true);
+                win.show();
+            }
+
+            const mObserver = new MutationObserver(fitContent);
+            mObserver.observe(document.body, {attributes: true, childList: true, subtree: true});
+
+            window.showTT = function(html) {
+                document.getElementById('content').innerHTML = html;
+            }
+
+            window.hideTT = function() {
+                let win = nw.Window.get();
+                win.moveTo(9999, 9999);
+            }
+
+            window.moveTT = function(x, y) {
+                let win = nw.Window.get();
+                win.moveTo(x, y);
+            }
+
+            //window.gameWindow = (await (new Promise(resolve => nw.Window.getAll(a => resolve(a))))).find(w => w.window.location.href.match("/index.html")).window;
+        </script>
+    </body>
+</html>

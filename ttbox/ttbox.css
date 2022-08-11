@@ -1,0 +1,452 @@
+
+::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    margin-top: 1px;
+    background: rgb(105, 105, 105);
+    border-radius: 5px;
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+    
+::-webkit-scrollbar-thumb {
+    background: rgb(177, 177, 177);
+    border-radius: 5px;
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(141, 141, 141); 
+}
+
+::-webkit-scrollbar-corner {
+    background-color: rgba(40, 40, 40, 1);
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+}
+
+html {
+    
+}
+
+body {
+    background-color: rgba(40, 40, 40, 1);
+}
+
+body::after {
+    content: ' ';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    border: 1px solid black;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+.stat > .stat-content::-webkit-scrollbar-track,
+.stat > .stat-content::-webkit-scrollbar-thumb {
+    border-right: 0px;
+}
+
+.stat > .stat-content::-webkit-scrollbar-track:horizontal,
+.stat > .stat-content::-webkit-scrollbar-thumb:horizontal {
+    border-bottom: 0px;
+}
+
+#wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: grid;
+    grid-auto-rows: minmax(min-content, max-content);
+    height: auto;
+    width: 100%;
+    border-radius: 10px;
+    background-color: rgba(40, 40, 40, 1);
+}
+
+#titlebar {
+    display: flex;
+
+    height: 23px;
+    width: 100%;
+    background-color: rgb(95, 95, 95);
+    color: rgba(255, 255, 255, 1);
+    -webkit-app-region: drag;
+    align-items: center;
+    padding: 0 5px;
+}
+
+.left,
+.right {
+    flex: 1;
+    display: flex;
+    min-width: -webkit-min-content;
+}
+
+.right {
+    justify-content: flex-end;
+}
+
+#title {
+    flex: 1;
+    text-align: center;
+}
+
+#pin,
+#dev,
+#reload,
+#pause,
+#pauseAT,
+#lock {
+    -webkit-app-region: no-drag;
+    margin: 2px;
+}
+
+.toggle {
+    color:rgb(180, 0, 0);
+}
+
+.toggle.on {
+    color: rgb(0, 180, 0);
+}
+
+#content {
+    display: grid;
+    grid-auto-columns: 5px; /* GRID_SIZE */
+    grid-auto-rows: 5px; /* GRID_SIZE */
+    grid-gap: 5px; /* GRID_GAP */
+    padding: 10px;
+    width: max-content;
+    user-select: none;
+}
+
+#content > .stat {
+    position: relative;
+    -webkit-app-region: no-drag;
+    border-radius: 5px;
+    background-color: rgb(61, 61, 61);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+
+#content > .stat.dragging {
+    cursor: grabbing;
+}
+
+#content > .stat.padding {
+    background-color: rgb(61, 61, 61, 0);
+    border: 0px solid black;
+    pointer-events: none;
+}
+
+#content > .stat > .resizers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    pointer-events: none;
+}
+
+.locked .resizers,
+.collapsed .resizers {
+    display: none;
+    pointer-events: none;
+}
+
+.resizers .resizer {
+    pointer-events: auto;
+}
+
+.resizers .resizer.top,
+.resizers .resizer.bottom {
+    height: 5px;
+    left: 5px;
+    right: 5px;
+    position: absolute;
+}
+
+.resizers .resizer.right,
+.resizers .resizer.left {
+    width: 5px;
+    top: 5px;
+    bottom: 5px;
+    position: absolute;
+}
+
+.resizers .resizer.top {
+    cursor: ns-resize;
+    top: 0;
+}
+.resizers .resizer.bottom {
+    cursor: ns-resize;
+    bottom: 0;
+}
+.resizers .resizer.right {
+    cursor: ew-resize;
+    right: 0;
+}
+.resizers .resizer.left {
+    cursor: ew-resize;
+    left: 0;
+}
+
+.resizers .resizer.top-left,
+.resizers .resizer.top-right,
+.resizers .resizer.bottom-left,
+.resizers .resizer.bottom-right {
+    width: 5px;
+    height: 5px;
+    position: absolute;
+}
+
+.resizers .resizer.top-left {
+    left: 0;
+    top: 0;
+    cursor: nwse-resize;
+}
+.resizers .resizer.top-right {
+    right: 0;
+    top: 0;
+    cursor: nesw-resize;
+}
+.resizers .resizer.bottom-left {
+    left: 0;
+    bottom: 0;
+    cursor: nesw-resize;
+}
+.resizers .resizer.bottom-right {
+    right: 0;
+    bottom: 0;
+    cursor: nwse-resize;
+}
+
+body.dragging * {
+    cursor: grabbing !important;
+}
+
+body.resizing.direction-top *,
+body.resizing.direction-bottom * {
+    cursor: ns-resize !important;
+}
+
+body.resizing.direction-left *,
+body.resizing.direction-right * {
+    cursor: ew-resize !important;
+}
+
+body.resizing.direction-bottom-right *,
+body.resizing.direction-top-left * {
+    cursor: nwse-resize !important;
+}
+
+body.resizing.direction-top-right *,
+body.resizing.direction-bottom-left * {
+    cursor: nesw-resize !important;
+}
+
+body.locked * {
+    cursor: default !important;
+}
+
+#content > .stat > .stat-title {
+    background: rgb(107, 107, 107);
+    line-height: 20px;
+    text-align: center;
+    display: flex;
+    height: 20px;
+    width: 100%;
+    color: rgba(255, 255, 255, 1);
+    align-items: center;
+    padding: 0px 5px;
+    box-sizing: border-box;
+    border-bottom: 1px solid black;
+}
+
+#content > .stat > .stat-content {
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(1, minmax(auto, max-content));
+    grid-auto-rows: max-content;
+    padding: 5px;
+    gap: 5px;
+    line-height: 18px;
+    overflow-y: auto;
+    user-select: text;
+}
+
+.map-container {
+    display: contents;
+}
+
+.key-value {
+    display: contents;
+    width: max-content;
+    text-align: center;
+}
+
+.key-value .name {
+
+}
+
+.key-value .value {
+
+}
+
+#content > #run .stat-content {
+    grid-template-columns: repeat(4, minmax(max-content, auto));
+    column-gap: 25px;
+}
+
+#content > #info .stat-content {
+    grid-template-columns: repeat(4, minmax(max-content, auto));
+    column-gap: 25px;
+}
+
+#content > #maps .stat-content {
+    grid-template-columns: repeat(3, minmax(max-content, auto));
+}
+
+#content > #voids .stat-content {
+    grid-template-columns: repeat(4, minmax(max-content, auto));
+}
+
+#content > #bw .stat-content {
+    grid-template-columns: repeat(2, minmax(max-content, auto));
+}
+
+#content > #playerspire .stat-content {
+    grid-auto-columns: 1fr;
+    grid-template-rows: 1fr 4fr 1fr;
+    grid-auto-rows: 1fr;
+    grid-template-columns: unset;
+}
+
+#content > #playerspire .stat-content #player-spire-traps {
+    display: grid;
+    padding: 1px;
+    gap: 1px;
+    grid-auto-rows: 1fr;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.player-spire-trap {
+    font-size: 10px;
+    border: 1px solid #dadada;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#content > #playerspire .stat-content #player-spire-upgrades {
+    display: grid;
+    padding: 1px;
+    gap: 1px;
+    grid-auto-rows: 1fr;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.player-spire-upgrade {
+    font-size: 10px;
+    border: 1px solid #dadada;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#content > #playerspire .stat-content #player-spire {
+    display: grid;
+    padding: 1px;
+    gap: 1px;
+    grid-auto-rows: 1fr;
+    grid-template-columns: repeat(5, 1fr);
+    background-color: #dadada;
+}
+
+#content > #playerspire .stat-content #player-spire .player-spire-cell {
+    display: inline-block;
+    position: relative;
+}
+
+#content > #heirlooms .stat-content {
+    grid-template-rows: repeat(3, max-content);
+    align-items: flex-start;
+    justify-content: center;
+    row-gap: 20px;
+}
+
+#content > #daily .stat-content {
+    grid-template-columns: repeat(7, minmax(auto, 1fr));
+    text-align: center;
+}
+
+#content > #heirlooms #heirlooms-equipped,
+#content > #heirlooms #heirlooms-carried,
+#content > #heirlooms #heirlooms-extra {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+}
+
+#content > #heirlooms #heirlooms-equipped {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+#content > #heirlooms #heirlooms-carried,
+#content > #heirlooms #heirlooms-extra {
+    grid-template-columns: repeat(8, 1fr);
+}
+
+#content > #heirlooms .heirloom {
+    display: inline;
+}
+
+#content > #heirlooms .heirloomThing {
+    font-size: 25px;
+    line-height: 25px;
+    width: 25px;
+    margin: auto;
+}
+
+#content > #run .key-value .name,
+#content > #run .key-value .name,
+#content > #info .key-value .name {
+    text-align: left;
+}
+#content > #voids .key-value .prefix {
+    text-align: left;
+    margin-left: 10px;
+}
+
+#content > #voids .key-value .suffix {
+    text-align: right;
+    margin-right: 10px;
+}
+
+#content > #voids .key-value .stack,
+#content > #voids .key-value .he {
+    text-align: right;
+}
+
+#content > #run .key-value .value,
+#content > #info .key-value .value {
+    text-align: right;
+}
+
+#maps .key-value[data-value="0"] {
+    display: none;
+}
