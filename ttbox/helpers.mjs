@@ -4,7 +4,6 @@ const getTT = async () => {
     
     let baseDir = document.getElementById('TTBox-Script').src;
     baseDir = baseDir.slice(0, baseDir.indexOf('/ttbox/ttbox.mjs'));
-    console.log(baseDir);
 
     if(tt === undefined) {
         if(!ttPromise) {

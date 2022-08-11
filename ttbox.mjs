@@ -23,4 +23,6 @@ const updateData = function() {
 }
 
 updateData();
-getToolbox();
+let x = await getToolbox();
+
+console.log(x);
