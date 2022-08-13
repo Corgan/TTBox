@@ -39,8 +39,8 @@ export default class BlockManager {
         localStorage.setItem('TrimpToolbox-Configuration', JSON.stringify(saveObj))
     }
 
-    static load() {
-        let lsString = localStorage.getItem('TrimpToolbox-Configuration') || JSON.stringify(DefaultConfig);
+    static load(reset=false) {
+        let lsString = (!reset && localStorage.getItem('TrimpToolbox-Configuration')) || JSON.stringify(DefaultConfig);
         let saveObj = JSON.parse(lsString);
         
         saveObj.blocks.forEach(b => {
@@ -57,6 +57,7 @@ export default class BlockManager {
 
         BlockManager.ontop = saveObj.ontop || false;
         BlockManager.locked = saveObj.locked || false;
+        BlockManager.redraw();
     }
 
     static start() {
