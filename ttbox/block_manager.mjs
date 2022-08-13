@@ -1,7 +1,9 @@
 import { createElement } from './helpers.mjs';
 import DefaultConfig from './default_config.mjs';
+import EventManager from './event_manager.mjs';
 
 export default class BlockManager {
+    constructor() { return this.constructor; }
     static types = {};
     static blocks = [];
 
@@ -11,14 +13,15 @@ export default class BlockManager {
     static dragging = false;
 
     static register(block) {
-        if(!this.types[block.name])
-            this.types[block.name] = block;
+        if(!BlockManager.types[block.name])
+        BlockManager.types[block.name] = block;
     }
 
     static new(data) {
-        if(data.type && this.types[data.type]) {
-            let block = new (this.types[data.type])(data);
+        if(data.type && BlockManager.types[data.type]) {
+            let block = new (BlockManager.types[data.type])(data);
             block.load(data);
+            block.update_config();
             return block;
         } else {
             return false;
@@ -28,10 +31,10 @@ export default class BlockManager {
     static save() {
         let saveObj = {}
 
-        saveObj.blocks = this.blocks.map(b => b.save());
+        saveObj.blocks = BlockManager.blocks.map(b => b.save());
 
-        saveObj.ontop = this.ontop;
-        saveObj.locked = this.locked;
+        saveObj.ontop = BlockManager.ontop;
+        saveObj.locked = BlockManager.locked;
 
         localStorage.setItem('TrimpToolbox-Configuration', JSON.stringify(saveObj))
     }
@@ -45,76 +48,77 @@ export default class BlockManager {
             if(!block) {
                 block = BlockManager.new(b);
                 if(block)
-                   this.blocks.push(block);
+                BlockManager.blocks.push(block);
             } else {
                 block.load(b);
+                block.update_config();
             }
         });
 
-        this.ontop = saveObj.ontop || false;
-        this.locked = saveObj.locked || false;
+        BlockManager.ontop = saveObj.ontop || false;
+        BlockManager.locked = saveObj.locked || false;
     }
 
     static start() {
-        this.load();
+        BlockManager.load();
 
-        this.$dev = document.getElementById("dev");
-        this.$reload = document.getElementById("reload");
-        this.$pin = document.getElementById("pin");
-        this.$pause = document.getElementById("pause");
-        this.$pauseAT = document.getElementById("pauseAT");
-        this.$lock = document.getElementById("lock");
+        BlockManager.$dev = document.getElementById("dev");
+        BlockManager.$reload = document.getElementById("reload");
+        BlockManager.$pin = document.getElementById("pin");
+        BlockManager.$pause = document.getElementById("pause");
+        BlockManager.$pauseAT = document.getElementById("pauseAT");
+        BlockManager.$lock = document.getElementById("lock");
 
 
-        this.$pin.classList.toggle('on', this.ontop);
+        BlockManager.$pin.classList.toggle('on', BlockManager.ontop);
         if(gameWindow.getPageSetting) {
-            this.$pauseAT.classList.toggle('on', !gameWindow.getPageSetting("PauseScript"));
-            this.$pauseAT.addEventListener('click', () => {
+            BlockManager.$pauseAT.classList.toggle('on', !gameWindow.getPageSetting("PauseScript"));
+            BlockManager.$pauseAT.addEventListener('click', () => {
                 gameWindow.settingChanged("PauseScript");
-                this.$pauseAT.classList.toggle('on', !gameWindow.getPageSetting("PauseScript"));
+                BlockManager.$pauseAT.classList.toggle('on', !gameWindow.getPageSetting("PauseScript"));
             });
         } else {
-            this.$pauseAT.classList.add('hide');
+            BlockManager.$pauseAT.classList.add('hide');
         }
 
-        gameWindow.swapClass('icon-', game.options.menu.pauseGame.enabled ? "icon-play4" : "icon-pause3", this.$pause);
-        gameWindow.swapClass('icon-', this.locked ? "icon-lock" : "icon-lock-open", this.$lock);
+        gameWindow.swapClass('icon-', game.options.menu.pauseGame.enabled ? "icon-play4" : "icon-pause3", BlockManager.$pause);
+        gameWindow.swapClass('icon-', BlockManager.locked ? "icon-lock" : "icon-lock-open", BlockManager.$lock);
 
-        this.$dev.addEventListener('click', () => nw.Window.get().showDevTools());
-        this.$reload.addEventListener('click', () => nw.Window.get().reload());
-        this.$pin.addEventListener('click', () => {
+        BlockManager.$dev.addEventListener('click', () => nw.Window.get().showDevTools());
+        BlockManager.$reload.addEventListener('click', () => nw.Window.get().reload());
+        BlockManager.$pin.addEventListener('click', () => {
             let win = nw.Window.get();
-            this.ontop = !this.ontop;
-            win.setAlwaysOnTop(this.ontop);
-            this.$pin.classList.toggle('on', this.ontop);
+            BlockManager.ontop = !BlockManager.ontop;
+            win.setAlwaysOnTop(BlockManager.ontop);
+            BlockManager.$pin.classList.toggle('on', BlockManager.ontop);
         });
-        this.$pause.addEventListener('click', () => {
+        BlockManager.$pause.addEventListener('click', () => {
             gameWindow.toggleSetting('pauseGame');
-            gameWindow.swapClass('icon-', game.options.menu.pauseGame.enabled ? "icon-play4" : "icon-pause3", this.$pause);
+            gameWindow.swapClass('icon-', game.options.menu.pauseGame.enabled ? "icon-play4" : "icon-pause3", BlockManager.$pause);
         });
-        this.$lock.addEventListener('click', () => {
+        BlockManager.$lock.addEventListener('click', () => {
             let win = nw.Window.get();
-            this.locked = !this.locked;
+            BlockManager.locked = !BlockManager.locked;
             //win.setResizable(!this.locked); Setting resizable to true after being set to false doesn't seem to work?
-            gameWindow.swapClass('icon-', this.locked ? "icon-lock" : "icon-lock-open", this.$lock);
-            this.redraw();
+            gameWindow.swapClass('icon-', BlockManager.locked ? "icon-lock" : "icon-lock-open", BlockManager.$lock);
+            BlockManager.redraw();
         });
 
         
         let win = nw.Window.get();
-        win.setAlwaysOnTop(this.ontop);
+        win.setAlwaysOnTop(BlockManager.ontop);
         win.setResizable(true);// !this.locked; Setting resizable to true after being set to false doesn't seem to work?
 
 
-        this.blocks.forEach(block => (block.init(), block.update()));
+        BlockManager.blocks.forEach(block => (block.init(), block.update()));
 
-        this.redraw();
+        BlockManager.redraw();
 
-        this.updateLoop = setInterval(this.blocks_update.bind(this), 250);
+        BlockManager.updateLoop = setInterval(BlockManager.blocks_update.bind(BlockManager), 250);
     }
 
     static blocks_update() {
-        this.blocks.forEach(block => {
+        BlockManager.blocks.forEach(block => {
             try {
                 block.update()
             } catch(e) {
@@ -124,37 +128,124 @@ export default class BlockManager {
     }
 
     static redraw() {
-        document.body.classList.toggle('resizing', this.resizing);
-        document.body.classList.toggle('dragging', this.dragging);
-        document.body.classList.toggle('locked', this.locked);
-        if(this.resizing) {
-            gameWindow.swapClass('direction', 'direction-' + this.direction, document.body);
+        document.body.classList.toggle('resizing', BlockManager.resizing);
+        document.body.classList.toggle('dragging', BlockManager.dragging);
+        document.body.classList.toggle('locked', BlockManager.locked);
+        if(BlockManager.resizing) {
+            gameWindow.swapClass('direction', 'direction-' + BlockManager.direction, document.body);
         } else {
             gameWindow.swapClass('direction', 'direction-none', document.body);
         }
-        this.blocks.forEach(block => block.redraw());
+        BlockManager.blocks.forEach(block => block.redraw());
         
         BlockManager.save();
     }
 
     static get(id) {
-        return this.blocks.find(block => block.id == id);
+        return BlockManager.blocks.find(block => block.id == id);
     }
 
     static at(x, y, ignore=[]) {
-        let block = this.blocks.find(block => !ignore.includes(block) && block.x <= x && block.x + block.w > x && block.y <= y && block.y + block.h > y);
+        let block = BlockManager.blocks.find(block => !ignore.includes(block) && block.x <= x && block.x + block.w > x && block.y <= y && block.y + block.h > y);
         return block;
     }
 
     static under(block) {
-        let column = this.blocks.filter(b => block.id != b.id && !((block.x >= b.x + b.w && block.x + block.w > b.x + b.w) || (block.x < b.x && block.x + block.w <= b.x)));
+        let column = BlockManager.blocks.filter(b => block.id != b.id && !((block.x >= b.x + b.w && block.x + block.w > b.x + b.w) || (block.x < b.x && block.x + block.w <= b.x)));
         let row = column.filter(b => (block.y <= b.y + b.h) && block.y + block.h > b.y);
         return row;
     }
 
     static top() {
-        let sorted = this.blocks.sort((a,b) => a.z - b.z);
+        let sorted = BlockManager.blocks.sort((a,b) => a.z - b.z);
         sorted.forEach((v,i) => v.z = i);
         return Math.max(...sorted.map(b => b.z));
+    }
+
+    static handle_list_update(event) {
+        let entry = event.target;
+        
+        let stat = event.composedPath().find(el => el.classList && el.classList.contains('stat'));
+        let config = event.composedPath().find(el => el.classList && el.classList.contains('config'));
+        let list_item = event.composedPath().find(el => el.classList && el.classList.contains('list-item'));
+        let list = event.composedPath().find(el => el.classList && el.classList.contains('list'));
+
+        BlockManager.handle_config_update(stat.id, config.getAttribute('data-config'), entry.getAttribute('data-id'), [...list.children].indexOf(list_item));
+    }
+
+    static handle_list_add(event) {
+        let entry = event.target;
+        
+        let stat = event.composedPath().find(el => el.classList && el.classList.contains('stat'));
+        let config = event.composedPath().find(el => el.classList && el.classList.contains('config'));
+        let list_item = event.composedPath().find(el => el.classList && el.classList.contains('list-item'));
+        let list = event.composedPath().find(el => el.classList && el.classList.contains('list'));
+
+        let options = BlockManager.get(stat.id).constructor[config.getAttribute('data-config')];
+        let cfg = BlockManager.get(stat.id)[config.getAttribute('data-config')];
+        if(options.length > 0) {
+            let def = options[0].id;
+            cfg.push(def);
+        }
+
+        BlockManager.handle_config_update(stat.id, config.getAttribute('data-config'), cfg);
+    }
+
+    static handle_list_delete(event) {
+        let entry = event.target;
+        
+        let stat = event.composedPath().find(el => el.classList && el.classList.contains('stat'));
+        let config = event.composedPath().find(el => el.classList && el.classList.contains('config'));
+        let list_item = event.composedPath().find(el => el.classList && el.classList.contains('list-item'));
+        let list = event.composedPath().find(el => el.classList && el.classList.contains('list'));
+
+        let cfg = BlockManager.get(stat.id)[config.getAttribute('data-config')];
+
+        cfg.splice([...list.children].indexOf(list_item), 1);
+
+        BlockManager.handle_config_update(stat.id, config.getAttribute('data-config'), cfg);
+    }
+
+    static handle_list_reorder(event, drop=false) {
+        let $list = event.composedPath().find(el => el.classList && el.classList.contains('list'));
+        if($list) {
+            event.preventDefault();
+            let $list_item = event.composedPath().find(el => el.classList && el.classList.contains('list-item'));
+            let $dragging_item = [...$list.children].find(el => el.classList && el.classList.contains('list-item') && el.classList.contains('dragging'));
+            if($dragging_item && $list_item) {
+                let from = [...$list.children].indexOf($dragging_item);
+                let to = [...$list.children].indexOf($list_item);
+                if(from > to)
+                    $dragging_item.after($list_item);
+                else
+                    $dragging_item.before($list_item);
+                if(drop) {
+                    let stat = event.composedPath().find(el => el.classList && el.classList.contains('stat'));
+                    let config = event.composedPath().find(el => el.classList && el.classList.contains('config'));
+
+                    let cfg = BlockManager.get(stat.id)[config.getAttribute('data-config')];
+
+                    let new_list = [...$list.children].filter($el => !$el.classList.contains('hide')).map($el => {
+                        let [ $draggable, $dropdown, $delete ] = [...$el.children];
+                        let [ $current, $entries ] = [...$dropdown.children];
+                        return $current.dataset.id;
+                    });
+                    BlockManager.handle_config_update(stat.id, config.getAttribute('data-config'), new_list);
+                }
+            }
+            if(drop)
+                $dragging_item.classList.remove('dragging');
+        }
+    }
+
+    static handle_config_update(id, prop, value, idx=-1) {
+        let block = BlockManager.get(id);
+        if(block[prop]) {
+            if(idx > -1 && block[prop][idx])
+                block[prop][idx] = value;
+            else
+                block[prop] = value;
+        }
+        block.update_config();
     }
 }

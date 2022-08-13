@@ -5,15 +5,19 @@ const GRID_SIZE = 5;
 const GRID_GAP = 5;
 
 export default class EventManager {
+    constructor() { return this.constructor; }
     static start(tt) {
         this.tt = tt;
         this.dragging = false;
-        document.body.addEventListener('mousedown', this.handle_event, true);
+        document.body.addEventListener('dragstart', this.handle_event, true);
+        document.body.addEventListener('dragover', this.handle_event, true);
+        document.body.addEventListener('drop', this.handle_event, true);
         document.body.addEventListener('mouseup', this.handle_event, true);
         document.body.addEventListener('mouseover', this.handle_event, true);
         document.body.addEventListener('mouseenter', this.handle_event, true);
         document.body.addEventListener('mouseout', this.handle_event, true);
         document.body.addEventListener('mousemove', this.handle_event, true);
+        document.body.addEventListener('mousedown', this.handle_event, true);
     }
 
     static handle_event(event) {
@@ -138,11 +142,34 @@ export default class EventManager {
         }
         
         if(event.type == "mousedown") {
-            let stat = event.composedPath().find(n => n.classList && n.classList.contains('stat'));
+            let stat = event.composedPath().find(el => el.classList && el.classList.contains('stat'));
             if(stat) {
                 BlockManager.get(stat.id).z = BlockManager.top() + 1;
                 BlockManager.redraw();
             }
+
+            let dropdowns = document.querySelectorAll('.dropdown.open');
+            [...dropdowns].forEach(dropdown => {
+                if(!dropdown.contains(event.target))
+                    dropdown.classList.remove('open')
+            });
+        }
+
+        if(event.type == "dragstart" && event.target.classList && event.target.classList.contains('draggable')) {
+            let $list = event.composedPath().find(el => el.classList && el.classList.contains('list'));
+            let $list_item = event.composedPath().find(el => el.classList && el.classList.contains('list-item'));
+            $list_item.classList.add('dragging');
+            [...$list.children].forEach((item, i) => {
+                item.dataset.idx = i;
+            });
+        }
+
+        if(event.type == "drop") {
+            BlockManager.handle_list_reorder(event, true);
+        }
+
+        if(event.type == "dragover") {
+            BlockManager.handle_list_reorder(event, false);
         }
 
         if(event.target.getAttribute('data-tooltip')) {

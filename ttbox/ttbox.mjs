@@ -2,7 +2,6 @@ class TTBox {
     static { window.TTBox = this; };
     
     static script = document.getElementById('TTBox-Script');
-    static instance = new this();
 
     static modules = [
         //'sim',
@@ -14,26 +13,22 @@ class TTBox {
         (async () => {
             await this.modules.reduce(async (promise, current, i) => {
                 await promise;
-                return this.instance.loadModule(current);
+                return this.loadModule(current);
             }, Promise.resolve());
-            //await this.instance.start();
+            //await this.start();
         })();
     };
 
     static async loop() {
-        if(this.instance)
-            await this.instance.update();
+        await this.update();
         
         await new Promise(resolve => setTimeout(resolve, 100)); // 100ms between updates
 
-        if(this.instance && this.instance.running)
+        if(this.running)
             requestAnimationFrame(async () => await this.loop());
     }
 
     static async reload() {
-        if(this.instance)
-            delete this.instance;
-        
         let src = this.script.src.split('?')[0];
         this.script.parentNode.removeChild(this.script);
 
@@ -46,20 +41,18 @@ class TTBox {
         this.script = script;
     }
 
-    /* INSTANCE METHODS */
+    static running = false;
+    static tick = 0;
+    static modules = {};
 
     constructor() {
-        if(this.constructor.instance)
-            return this.constructor.instance;
-
-        this.running = false;
-        this.tick = 0;
-        this.modules = {};
+        if(this.constructor)
+            return this.constructor;
     }
 
 
     /* MODULES */
-    async loadModule(module) {
+    static async loadModule(module) {
         if(this.modules[module])
             return this.modules[module];
 
@@ -79,13 +72,8 @@ class TTBox {
         return this.modules[module];
     }
 
-    async reloadModule(module) {
+    static async reloadModule(module) {
         if(this.modules[module]) {
-            if(this.modules[module].instance) { // Delete the instance?
-                delete this.modules[module].instance;
-                this.modules[module].instance = undefined;
-            }
-
             delete this.modules[module]; // This kills the module
             this.modules[module] = undefined;
         }
@@ -95,7 +83,7 @@ class TTBox {
 
 
     /* STATE CONTROL */
-    async start() {
+    static async start() {
         if(!this.running) {
             this.running = true;
             let modules = Object.values(this.modules);
@@ -116,7 +104,7 @@ class TTBox {
         }
     }
 
-    async stop() {
+    static async stop() {
         if(this.running) {
             this.running = false;
             let modules = Object.values(this.modules);
@@ -135,7 +123,7 @@ class TTBox {
         }
     }
 
-    async update() {
+    static async update() {
         if(this.running) {
             this.tick++;
             let modules = Object.values(this.modules);

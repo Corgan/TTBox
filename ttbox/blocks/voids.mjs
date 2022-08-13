@@ -35,6 +35,27 @@ export default class VoidsBlock extends StatBlock {
             ]
         });
 
+        this.$total = createElement('div', {
+            classList: ['key-value'],
+            id: `void-vm-total`,
+            parent: this.$content,
+            children: [
+                createElement('span', {
+                    classList: ['prefix'],
+                    text: `Total`
+                }),
+                createElement('span', {
+                    classList: ['suffix']
+                }),
+                createElement('span', {
+                    classList: ['stack']
+                }),
+                createElement('span', {
+                    classList: ['he']
+                })
+            ]
+        })
+
         this.$vm_container = createElement('div', {
             classList: ['map-container'],
             parent: this.$content,
@@ -61,27 +82,6 @@ export default class VoidsBlock extends StatBlock {
                 })
             ]
         }));
-
-        this.$total = createElement('div', {
-            classList: ['key-value'],
-            id: `void-vm-total`,
-            parent: this.$content,
-            children: [
-                createElement('span', {
-                    classList: ['prefix'],
-                    text: `Total`
-                }),
-                createElement('span', {
-                    classList: ['suffix']
-                }),
-                createElement('span', {
-                    classList: ['stack']
-                }),
-                createElement('span', {
-                    classList: ['he']
-                })
-            ]
-        })
     }
     update() {
         super.update();
@@ -97,7 +97,7 @@ export default class VoidsBlock extends StatBlock {
         };
 
         this.maps.map((map) => (this.$vm_container.removeChild(map.$el), map))
-            .sort((a, b) => (b && b.stacked || 0) - (a && a.stacked || 0))
+            .sort((a, b) => (b.stacked != undefined ? b.stacked ? b.stacked+1 : 1 : 0) - (a.stacked != undefined ? a.stacked ? a.stacked+1 : 1 : 0))
             .forEach((map) => this.$vm_container.appendChild(map.$el));
 
         this.maps.forEach((map) => {

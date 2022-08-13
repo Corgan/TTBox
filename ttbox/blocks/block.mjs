@@ -2,6 +2,7 @@ import BlockManager from '../block_manager.mjs';
 import { createElement } from './../helpers.mjs';
 
 export default class StatBlock {
+    static blacklist = ['collapsed', 'dragging', 'resizing', 'configuring', 'h', 'w', 'x', 'y', 'z']
     constructor({id='block', title="Stat Block", h=1, w=1, x=1, y=1, z=1, ...args}) {
         this.$el = createElement('div', {
             id: id,
@@ -32,14 +33,25 @@ export default class StatBlock {
                             attributes: [
                                 ['onclick', `BlockManager.get("${id}").toggle();`]
                             ]
+                        }),
+                        createElement('span', {
+                            classList: ['title-configure', 'icon-tools'],
+                            attributes: [
+                                ['onclick', `BlockManager.get("${id}").configure();`]
+                            ]
                         })
                     ]
-                }),
+                })
             ]
         });
 
         this.$content = createElement('div', {
             classList: ['stat-content'],
+            parent: this.$el
+        });
+
+        this.$config = createElement('div', {
+            classList: ['stat-config'],
             parent: this.$el
         });
 
@@ -63,8 +75,7 @@ export default class StatBlock {
         this.collapsed = false;
         this.dragging = false;
         this.resizing = false;
-        this.predragX = x;
-        this.predragY = y;
+        this.configuring = false;
         this.h = h;
         this.w = w;
         this.x = x;
@@ -109,6 +120,7 @@ export default class StatBlock {
 
         this.$el.classList.toggle('dragging', this.dragging);
         this.$el.classList.toggle('resizing', this.resizing);
+        this.$el.classList.toggle('configuring', this.configuring);
         if(this.resizing) {
             gameWindow.swapClass('direction', 'direction-' + BlockManager.direction, this.$el);
         } else {
@@ -154,11 +166,52 @@ export default class StatBlock {
         BlockManager.redraw();
     }
     toggle(e) {
-        let $collapse = this.$title.querySelector('.title-collapse');
         if(this.collapsed) {
             this.collapsed = false;
         } else {
             this.collapsed = true;
+        }
+        BlockManager.redraw();
+    }
+    update_config() {
+        let $children = [...this.$config.children];
+        let $id = $children.find(el => el.classList.contains('config-id'));
+        if(!$id)
+            $id = createElement('div', {
+                parent: this.$config,
+                classList: ['config', 'config-id'],
+                attributes: [['data-config', 'id']],
+                children: [
+                    createElement('span', {
+                        text: "ID"
+                    }),
+                    createElement('input', {
+                        attributes: [['type', 'text'], ['value', this.id]]
+                    })
+                ]
+            });
+
+        let $title = $children.find(el => el.classList.contains('config-title'));
+        if(!$title)
+            $title = createElement('div', {
+                parent: this.$config,
+                classList: ['config', 'config-title'],
+                attributes: [['data-config', 'title']],
+                children: [
+                    createElement('span', {
+                        text: "Title"
+                    }),
+                    createElement('input', {
+                        attributes: [['type', 'text'], ['value', this.title]],
+                        parent: this.$config
+                    })
+                ]
+            });
+    }
+    configure(e, bool=!this.configuring) {
+        if(!this.collapsed) {
+            this.configuring = bool;
+            this.update_config();
         }
         BlockManager.redraw();
     }

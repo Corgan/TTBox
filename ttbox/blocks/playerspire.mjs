@@ -59,18 +59,25 @@ export default class PlayerSpireBlock extends StatBlock {
             let $upgrade = this.spire_upgrades[i];
             
             if (trap.locked) return;
+
             let cost = gameWindow.playerSpire.getTrapCost(trap.name);
             let trap_color = (gameWindow.playerSpire.runestones >= cost) ? trap.color : "grey";
-            if (trap.isTower && trap.owned >= 10) color = "grey";
+            if (trap.isTower && trap.owned >= 10)
+                color = "grey";
+            
             $trap.style.backgroundColor = trap_color;
             $trap.innerHTML = `<span class='icomoon icon-${trap.icon}'></span>`;
+            $trap.setAttribute('data-tooltip', `<div style='background-color: black; padding: 10px; display: flex; flex-direction: column;'><div>${trap.name} ${gameWindow.romanNumeral(trap.level)}</div><div>${trap.description}</div></div>`);
 
+            
             if (!trap.upgrades || trap.upgrades.length < trap.level) return;
+
             let nextUpgrade = trap.upgrades[trap.level - 1];
             let upgrade_color = (nextUpgrade.cost > gameWindow.playerSpire.runestones || (game.global.highestLevelCleared + 1 < nextUpgrade.unlockAt)) ? "grey" : trap.color;
 
             $upgrade.style.backgroundColor = upgrade_color;
             $upgrade.innerHTML = `${gameWindow.romanNumeral(trap.level + 1)}`;
+            $upgrade.setAttribute('data-tooltip', `<div style='background-color: black; padding: 10px; display: flex; flex-direction: column;'><div>${trap.name} ${gameWindow.romanNumeral(trap.level + 1)}</div><div>${nextUpgrade.description}</div></div>`);
         });
         
         

@@ -1,20 +1,19 @@
 export default class TTModule {
-    constructor() {
-        if(this.constructor.instance)
-            return this.constructor.instance;
-        this.running = false;
-    }
+    constructor() { if(this.constructor) return this.constructor; }
+    
+    static id = 'module';
+    static running = false;
 
-    async start() {
-        console.log(`Starting ${this.constructor.id}`);
+    static async start() {
+        console.log(`Starting ${this.id}`);
         this.running = true;
     }
 
-    async stop() {
-        console.log(`Stopping ${this.constructor.id}`);
+    static async stop() {
+        console.log(`Stopping ${this.id}`);
         this.running = false;
     }
 
-    async update() {
+    static async update() {
     }
 }

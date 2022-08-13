@@ -1,28 +1,22 @@
 import TTModule from './module.mjs';
 
 export default class UtilsModule extends TTModule {
+    constructor() { if(this.constructor) return this.constructor; }
     static id = 'utils';
-    static instance = new this();
 
-    constructor() {
-        super(...arguments);
-        if(this.constructor.instance)
-            return this.constructor.instance;
-    }
-
-    async start() {
+    static async start() {
         await super.start(...arguments);
     }
 
-    async stop() {
+    static async stop() {
         await super.stop(...arguments);
     }
 
-    async update() {
+    static async update() {
         await super.update(...arguments);
     }
 
-    badCoordLevel(world) {
+    static badCoordLevel(world) {
         let amt = 1;
         for (var x = 0; x < world - 1; x++) {
             amt = Math.ceil(amt * 1.25);
@@ -30,7 +24,7 @@ export default class UtilsModule extends TTModule {
         return amt;
     }
 
-    corruptionStart({challengeActive=game.global.challengeActive, headstart=0, ignoreCorrupted=false, runningChallengeSquared=game.global.runningChallengeSquared}) {
+    static corruptionStart({challengeActive=game.global.challengeActive, headstart=0, ignoreCorrupted=false, runningChallengeSquared=game.global.runningChallengeSquared}) {
         if(challengeActive == "Eradicated") return 1;
         if(challengeActive == "Corrupted") return 60;
         if(runningChallengeSquared)
@@ -47,13 +41,13 @@ export default class UtilsModule extends TTModule {
         }
     }
 
-    magmaStart({ challengeActive=game.global.challengeActive }) {
+    static magmaStart({ challengeActive=game.global.challengeActive }) {
         if(challengeActive == "Eradicated")
             return 1;
         return 230;
     }
 
-    magmaActive({ world=game.global.world, challengeActive=game.global.challengeActive, canMagma=game.global.canMagma }) {
+    static magmaActive({ world=game.global.world, challengeActive=game.global.challengeActive, canMagma=game.global.canMagma }) {
         return (canMagma && world >= this.magmaStart(...arguments));
     }
 }

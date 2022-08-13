@@ -1,29 +1,24 @@
 import TTModule from './module.mjs';
 
 export default class SimulatorModule extends TTModule {
+    constructor() { if(this.constructor) return this.constructor; }
+
     static id = 'sim';
-    static instance = new this();
 
-    constructor() {
-        super(...arguments);
-        if(this.constructor.instance)
-            return this.constructor.instance;
-    }
-
-    async start() {
+    static async start() {
         await super.start(...arguments);
     }
 
-    async stop() {
+    static async stop() {
         await super.stop(...arguments);
     }
 
-    async update() {
+    static async update() {
         await super.update(...arguments);
     }
 
 
-    enemyAt({
+    static enemyAt({
         mapsActive,
         spireActive,
         challengeActive,
@@ -271,7 +266,7 @@ export default class SimulatorModule extends TTModule {
 		},
     */
 
-    get grid() {
+    static get grid() {
         return game.global.gridArray.map(cell => {
             return this.enemyAt({
                 world: game.global.world,
@@ -283,30 +278,30 @@ export default class SimulatorModule extends TTModule {
     };
     
 
-    get attackGrid() {
+    static get attackGrid() {
         return game.global.gridArray.map(cell => {
             return this.calcBadGuyDmg(null, this.getEnemyAttack(game.global.world, cell.level, cell.name, 1.0, cell.corrupted != undefined), true, true);
         });
     };
 
-    get healthGrid() {
+    static get healthGrid() {
         return game.global.gridArray.map(cell => {
             return this.calcBadGuyHealth(null, this.getEnemyMaxHealth(game.global.world, cell.level, cell.name, 1.0, cell.corrupted != undefined), true, true);
         });
     };
 
-    get minAttack() { return Math.min(...this.attackGrid); }
-    get avgAttack() { return [...this.attackGrid].reduce((p,c,i) => p + c, 0) / game.global.gridArray.length; }
-    get maxAttack() { return Math.max(...this.attackGrid); }
+    static get minAttack() { return Math.min(...this.attackGrid); }
+    static get avgAttack() { return [...this.attackGrid].reduce((p,c,i) => p + c, 0) / game.global.gridArray.length; }
+    static get maxAttack() { return Math.max(...this.attackGrid); }
 
-    get minHealth() { return Math.min(...this.healthGrid); }
-    get avgHealth() { return [...this.healthGrid].reduce((p,c,i) => p + c, 0) / game.global.gridArray.length; }
-    get maxHealth() { return Math.max(...this.healthGrid); }
-
-
+    static get minHealth() { return Math.min(...this.healthGrid); }
+    static get avgHealth() { return [...this.healthGrid].reduce((p,c,i) => p + c, 0) / game.global.gridArray.length; }
+    static get maxHealth() { return Math.max(...this.healthGrid); }
 
 
-    getCorruptScale(a) {
+
+
+    static getCorruptScale(a) {
         if(a == "attack")
             return mutations.Corruption.statScale(3);
         if(a == "health")
@@ -314,11 +309,11 @@ export default class SimulatorModule extends TTModule {
         return 0;
     }
 
-    getEnemyAttack(a,b,c="Grimp",d,e){var f=0;return f+=50*Math.sqrt(a)*Math.pow(3.27,a/2),f-=10,1==a?(f*=0.35,f=0.2*f+0.75*f*(b/100)):2==a?(f*=0.5,f=0.32*f+0.68*f*(b/100)):60>a?f=0.375*f+0.7*f*(b/100):(f=0.4*f+0.9*f*(b/100),f*=Math.pow(1.15,a-59)),60>a&&(f*=0.85),d&&(f*=d),f*=e?this.getCorruptScale("attack"):game.badGuys[c].attack,Math.floor(f)}
-    getEnemyMaxHealth(a,b=30,c="Grimp",d,e){var f=0;return f+=130*Math.sqrt(a)*Math.pow(3.265,a/2),f-=110,1==a||2==a&&10>b?(f*=0.6,f=0.25*f+0.72*f*(b/100)):60>a?f=0.4*f+0.4*f*(b/110):(f=0.5*f+0.8*f*(b/100),f*=Math.pow(1.1,a-59)),60>a&&(f*=0.75),d&&(f*=d),f*=e?this.getCorruptScale("health"):game.badGuys[c].health,Math.floor(f)}
+    static getEnemyAttack(a,b,c="Grimp",d,e){var f=0;return f+=50*Math.sqrt(a)*Math.pow(3.27,a/2),f-=10,1==a?(f*=0.35,f=0.2*f+0.75*f*(b/100)):2==a?(f*=0.5,f=0.32*f+0.68*f*(b/100)):60>a?f=0.375*f+0.7*f*(b/100):(f=0.4*f+0.9*f*(b/100),f*=Math.pow(1.15,a-59)),60>a&&(f*=0.85),d&&(f*=d),f*=e?this.getCorruptScale("attack"):game.badGuys[c].attack,Math.floor(f)}
+    static getEnemyMaxHealth(a,b=30,c="Grimp",d,e){var f=0;return f+=130*Math.sqrt(a)*Math.pow(3.265,a/2),f-=110,1==a||2==a&&10>b?(f*=0.6,f=0.25*f+0.72*f*(b/100)):60>a?f=0.4*f+0.4*f*(b/110):(f=0.5*f+0.8*f*(b/100),f*=Math.pow(1.1,a-59)),60>a&&(f*=0.75),d&&(f*=d),f*=e?this.getCorruptScale("health"):game.badGuys[c].health,Math.floor(f)}
 
 
-    getSpireStats(spireNum=1, cell, name) {
+    static getSpireStats(spireNum=1, cell, name) {
         let stats = {};
 
         let mod = {
@@ -338,7 +333,7 @@ export default class SimulatorModule extends TTModule {
         return stats;
     };
 
-    modSpireAttack(world, cell, name) {
+    static modSpireAttack(world, cell, name) {
         var enemy = name ? name : game.global.gridArray[cell].name;
         var base = game.global.getEnemyAttack(cell, enemy, false);
         var mod = 1.17;
@@ -354,7 +349,7 @@ export default class SimulatorModule extends TTModule {
         return base;
     }
 
-    modSpireHealth(spireNum=1) {
+    static modSpireHealth(spireNum=1) {
         //var spireNum = Math.floor((game.global.world - 100) / 100);
         let base = 1;
         let mod = 1.14;
@@ -366,7 +361,7 @@ export default class SimulatorModule extends TTModule {
         return base;
     }
 
-    calcDailyAttackMod(number) {
+    static calcDailyAttackMod(number) {
         if (game.global.challengeActive == "Daily") {
             if (typeof game.global.dailyChallenge.badStrength !== 'undefined') {
                 number *= dailyModifiers.badStrength.getMult(game.global.dailyChallenge.badStrength.strength);
@@ -381,7 +376,7 @@ export default class SimulatorModule extends TTModule {
         return number;
     }
 
-    calcBadGuyDmg(enemy, attack, daily, maxormin, disableFlucts) {
+    static calcBadGuyDmg(enemy, attack, daily, maxormin, disableFlucts) {
         var number;
         if (enemy)
             number = enemy.attack;
@@ -438,7 +433,7 @@ export default class SimulatorModule extends TTModule {
             return number;
     }
 
-    calcBadGuyHealth(enemy, health, daily) {
+    static calcBadGuyHealth(enemy, health, daily) {
         var number;
         if (enemy)
             number = enemy.health;

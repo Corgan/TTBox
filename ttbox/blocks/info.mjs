@@ -18,11 +18,16 @@ export default class InfoBlock extends StatBlock {
     }
     update() {
         super.update();
-        this.props.forEach((id, i) => {
+
+        let max = Math.max(this.$content.children.length, this.props.length);
+
+        for(let i=0; i<max; i++) {
+            let id = this.props[i];
+            let $el = this.$content.children[i];
             let prop = this.constructor.props.find(p => p.id == id);
-            let item = this.$content.children[i];
-            if(!item) {
-                item = createElement('div', {
+
+            if(!$el) {
+                $el = createElement('div', {
                     classList: ['key-value'],
                     id: `${this.id}-${prop.id}`,
                     parent: this.$content,
@@ -38,13 +43,22 @@ export default class InfoBlock extends StatBlock {
                     ]
                 })
             } else {
-                let v = prop.fn();
-                if(item.getAttribute('data-value') != v) {
-                    item.setAttribute('data-value', v);
-                    item.children[1].textContent = v;
+                if(!prop) {
+                    $el.classList.add('hide');
+                } else {
+                    $el.classList.remove('hide');
+                    let [ $name, $value ] = [...$el.children];
+                    let v = prop.fn();
+                    if($el.id != `${this.id}-${prop.id}`)
+                        $el.id = `${this.id}-${prop.id}`;
+                    if($name.textContent != prop.name)
+                        $name.textContent = prop.name;
+                    if($value.textContent != v) {
+                        $value.textContent = v;
+                    }
                 }
             }
-        });
+        };
     }
     save() {
         let ret = super.save();
@@ -54,6 +68,106 @@ export default class InfoBlock extends StatBlock {
     load(data) {
         super.load(data);
         this.props = data.props;
+    }
+    update_config() {
+        super.update_config();
+        let $children = [...this.$config.children];
+
+        let $props = $children.find(el => el.classList.contains('config-props'));
+        if(!$props)
+            $props = createElement('div', {
+                parent: this.$config,
+                classList: ['config', 'config-props'],
+                attributes: [['data-config', 'props']],
+                children: [
+                    createElement('span', {
+                        text: "Props"
+                    }),
+                    createElement('div', {
+                        classList: ['list-container'],
+                        children: [
+                            createElement('div', {
+                                classList: ['list']
+                            }),
+                            createElement('div', {
+                                classList: ['add'],
+                                attributes: [['onclick', 'BlockManager.handle_list_add(event);']],
+                                children: [
+                                    createElement('span', { classList: ['icon-plus'] })
+                                ]
+                            })
+                        ]
+                    })
+                ]
+            });
+
+        let [ $label, $props_container ] = [...$props.children];
+        let [ $props_ul, $add_prop ] = [...$props_container.children];
+
+        let max = Math.max($props_ul.children.length, this.props.length);
+        let props = this.props.map(p => this.constructor.props.find(pr => pr.id == p));
+
+        for(let i=0; i<max; i++) {
+            let $el = $props_ul.children[i];
+            if(!$el) {
+                $el = createElement('div', {
+                    classList: ['list-item'],
+                    children: [
+                        createElement('div', {
+                            classList: ['draggable'],
+                            attributes: [['draggable', true]],
+                            children: [
+                                createElement('span', { classList: ['icon-menu'] })
+                            ]
+                        }),
+                        createElement('div', {
+                            classList:  ['dropdown'],
+                            attributes: [['onclick', 'this.classList.toggle("open");']],
+                            children: [
+                                createElement('div', {
+                                    classList: ['dropdown-entry'],
+                                    text: props[i].name,
+                                    attributes: [['data-id', props[i].id]]
+                                }),
+                                createElement('div', {
+                                    classList: ['dropdown-content'],
+                                    children: this.constructor.props.map(prop => createElement('div', {
+                                        classList: ['dropdown-entry'],
+                                        text: prop.name,
+                                        attributes: [['data-id', prop.id], ['onclick', 'BlockManager.handle_list_update(event);']]
+                                    }))
+                                })
+                            ]
+                        }),
+                        createElement('div', {
+                            classList: ['delete'],
+                            children: [
+                                createElement('span', { classList: ['icon-minus'] })
+                            ],
+                            attributes: [['onclick', 'BlockManager.handle_list_delete(event);']]
+                        })
+                    ],
+                    parent: $props_ul
+                });
+            }
+
+            let prop = props[i];
+            
+            if(!prop) {
+                $el.classList.add('hide');
+            } else {
+                $el.classList.remove('hide');
+                let [ $draggable, $dropdown, $delete ] = [...$el.children];
+                let [ $current, $entries ] = [...$dropdown.children];
+                if($current.getAttribute('data-id') != prop.id) {
+                    $current.setAttribute('data-id', prop.id);
+                    $current.textContent = prop.name;
+                }
+                [...$entries.children].forEach(entry => {
+                    entry.classList.toggle('hide', entry.getAttribute('data-id') == prop.id);
+                });
+            }
+        }
     }
     static props = [
         { id: "hze", name: "HZE", fn: () => game.global.highestLevelCleared },
@@ -102,6 +216,9 @@ export default class InfoBlock extends StatBlock {
         { id: "gator-ratio", name: "Pop Ratio", fn: () => gameWindow.prettify(game.resources.trimps.realMax() / game.resources.trimps.getCurrentSend()) },
         { id: "scry-cells", name: "Scry Cells", fn: () => [...new Array(100).keys()].map(x => gameWindow.getRandomIntSeeded(game.global.scrySeed + (x + 1) - (game.global.lastClearedCell + 1), 0, 100)).map((x, i) => x <= 52 && x >= 50 ? i : 0).filter(Boolean).join(', ') },
         { id: "fluff-dmg", name: "Fluff %", fn: () => gameWindow.prettify((gameWindow.Fluffy.getDamageModifier() - 1) * 100) },
+        { id: "golden-helium", name: "Golden Helium", fn: () => `${game.goldenUpgrades.Helium.purchasedAt.length} (${Math.round(game.goldenUpgrades.Helium.currentBonus * 100)}%)` },
+        { id: "golden-battle", name: "Golden Battle", fn: () => `${game.goldenUpgrades.Battle.purchasedAt.length} (${Math.round(game.goldenUpgrades.Battle.currentBonus * 100)}%)` },
+        { id: "golden-void", name: "Golden Void", fn: () => `${game.goldenUpgrades.Void.purchasedAt.length} (${Math.round(game.goldenUpgrades.Void.currentBonus * 100)}%)` },
         { id: "run-xp", name: "Run XP", fn: () => {
             if(!gameWindow.getPageSetting)
                 return 'Requires AT';

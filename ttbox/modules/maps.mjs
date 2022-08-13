@@ -1,24 +1,19 @@
 import TTModule from './module.mjs';
 
 export default class MapsModule extends TTModule {
+    constructor() { if(this.constructor) return this.constructor; }
+
     static id = 'maps';
-    static instance = new this();
 
-    constructor() {
-        super(...arguments);
-        if(this.constructor.instance)
-            return this.constructor.instance;
-    }
-
-    async start() {
+    static async start() {
         await super.start(...arguments);
     }
 
-    async stop() {
+    static async stop() {
         await super.stop(...arguments);
     }
 
-    async update() {
+    static async update() {
         await super.update(...arguments);
     }
 }
