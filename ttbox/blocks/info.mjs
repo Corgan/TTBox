@@ -300,5 +300,33 @@ export default class InfoBlock extends StatBlock {
 
             return gameWindow.prettify(xp);
         }},
+        { id: "mmm-bonus", name: "MMM Bonus", fn: () => {
+            var max = 120;
+            var timeOnZone = Math.floor((gameWindow.getGameTime() - game.global.zoneStarted) / 60000);
+            if (game.talents.magmamancer.purchased) timeOnZone += 5;
+            if (game.talents.stillMagmamancer.purchased){
+                timeOnZone = Math.floor(timeOnZone + game.global.spireRows);
+                var extraMax = game.global.spireRows * 0.5;
+                max = Math.floor((extraMax + max) / 10) * 10;
+            }
+            return gameWindow.prettify((game.jobs.Magmamancer.getBonusPercent() - 1) * 100) + '%';
+        }},
+        { id: "mmm-timer", name: "MMM Timer", fn: () => {
+            var max = 120;
+            var timeOnZone = Math.floor((gameWindow.getGameTime() - game.global.zoneStarted) / 60000);
+            if (game.talents.magmamancer.purchased) timeOnZone += 5;
+            if (game.talents.stillMagmamancer.purchased){
+                timeOnZone = Math.floor(timeOnZone + game.global.spireRows);
+                var extraMax = game.global.spireRows * 0.5;
+                max = Math.floor((extraMax + max) / 10) * 10;
+            }
+
+            if (timeOnZone >= max)
+                return gameWindow.prettify(max) + 'm';
+            else{
+                var remaining = 10 - (timeOnZone % 10);
+                return `${timeOnZone}m (${gameWindow.prettify(remaining)}m)`;
+            }
+        }}
     ]
 }

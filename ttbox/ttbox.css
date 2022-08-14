@@ -442,6 +442,11 @@ input[type="text"] {
     grid-template-columns: repeat(2, minmax(max-content, auto));
 }
 
+#content > #c2s .stat-content {
+    grid-template-columns: repeat(3, minmax(max-content, auto));
+    column-gap: 25px;
+}
+
 #content > #playerspire .stat-content {
     grid-auto-columns: 1fr;
     grid-template-rows: 1fr 4fr 1fr;
