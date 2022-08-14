@@ -235,26 +235,31 @@ body::after {
 
 body.dragging * {
     cursor: grabbing !important;
+    user-select: none;
 }
 
 body.resizing.direction-top *,
 body.resizing.direction-bottom * {
     cursor: ns-resize !important;
+    user-select: none;
 }
 
 body.resizing.direction-left *,
 body.resizing.direction-right * {
     cursor: ew-resize !important;
+    user-select: none;
 }
 
 body.resizing.direction-bottom-right *,
 body.resizing.direction-top-left * {
     cursor: nwse-resize !important;
+    user-select: none;
 }
 
 body.resizing.direction-top-right *,
 body.resizing.direction-bottom-left * {
     cursor: nesw-resize !important;
+    user-select: none;
 }
 
 body.locked * {
@@ -367,7 +372,8 @@ input[type="text"] {
     grid-auto-rows: max-content;
     padding: 5px;
     gap: 5px;
-    line-height: 18px;
+    font-size: 11px;
+    line-height: 11px;
     overflow-y: auto;
     user-select: text;
 }
@@ -512,6 +518,7 @@ input[type="text"] {
 #content > #daily .stat-content {
     grid-template-columns: repeat(7, minmax(auto, 1fr));
     text-align: center;
+    line-height: 16px;
 }
 
 #content > #heirlooms #heirlooms-equipped,

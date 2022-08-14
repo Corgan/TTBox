@@ -98,7 +98,7 @@ export default class EventManager {
 
         if(event.type == "mousedown") {
             let stat = event.composedPath().find(n => n.classList && n.classList.contains('stat-title'));
-            if(stat) {
+            if(stat && !document.body.classList.contains('locked')) {
                 this.dragging = BlockManager.get(stat.parentNode.id);
                 this.dragging.dragging = true;
                 this.dragging.z = BlockManager.top() + 1;
@@ -143,7 +143,7 @@ export default class EventManager {
         
         if(event.type == "mousedown") {
             let stat = event.composedPath().find(el => el.classList && el.classList.contains('stat'));
-            if(stat) {
+            if(stat && !document.body.classList.contains('locked')) {
                 BlockManager.get(stat.id).z = BlockManager.top() + 1;
                 BlockManager.redraw();
             }

@@ -90,26 +90,26 @@ export default class StatBlock {
     }
     save() {
         let ret = {};
-        ret.id = this.id;
-        ret.title = this.title;
-        ret.x = this.x;
-        ret.y = this.y;
-        ret.w = this.w;
-        ret.h = this.h;
-        ret.z = this.z;
-        ret.collapsed = this.collapsed;
+        ret.id = this.id || "block_" + Math.floor(Math.random()*1000);
+        ret.title = this.title || "Stat Block";
+        ret.x = this.x || 1;
+        ret.y = this.y || 1;
+        ret.w = this.w || 10;
+        ret.h = this.h || 10;
+        ret.z = this.z || 0;
+        ret.collapsed = this.collapsed || false;
         ret.type = this.constructor.name;
         return ret;
     }
     load(data) {
-        this.id = data.id;
-        this.title = data.title;
-        this.x = data.x;
-        this.y = data.y;
-        this.w = data.w;
-        this.h = data.h;
-        this.z = data.z;
-        this.collapsed = data.collapsed;
+        this.id = data.id || "block_" + Math.floor(Math.random()*1000);
+        this.title = data.title || "Stat Block";
+        this.x = data.x || 1;
+        this.y = data.y || 1;
+        this.w = data.w || 10;
+        this.h = data.h || 10;
+        this.z = data.z || 0;
+        this.collapsed = data.collapsed || false;
     }
     redraw() {
         this.$el.style.gridRowStart = this.y;
