@@ -1,11 +1,8 @@
-import BlockManager from '../block_manager.mjs';
+import TTBox from '../ttbox.mjs';
 import StatBlock from './block.mjs';
 import { createElement } from './../helpers.mjs';
 
 export default class InfoBlock extends StatBlock {
-    static {
-        BlockManager.register(this);
-    }
     constructor({...args}={}) {
         super({id: 'info', ...args});
         let { props } = args;
@@ -91,7 +88,7 @@ export default class InfoBlock extends StatBlock {
                             }),
                             createElement('div', {
                                 classList: ['add'],
-                                attributes: [['onclick', 'BlockManager.handle_list_add(event);']],
+                                attributes: [['onclick', 'TTBox.get("events").handle_list_add(event);']],
                                 children: [
                                     createElement('span', { classList: ['icon-plus'] })
                                 ]
@@ -134,7 +131,7 @@ export default class InfoBlock extends StatBlock {
                                     children: this.constructor.props.map(prop => createElement('div', {
                                         classList: ['dropdown-entry'],
                                         text: prop.name,
-                                        attributes: [['data-id', prop.id], ['onclick', 'BlockManager.handle_list_update(event);']]
+                                        attributes: [['data-id', prop.id], ['onclick', 'TTBox.get("events").handle_list_update(event);']]
                                     }))
                                 })
                             ]
@@ -144,7 +141,7 @@ export default class InfoBlock extends StatBlock {
                             children: [
                                 createElement('span', { classList: ['icon-minus'] })
                             ],
-                            attributes: [['onclick', 'BlockManager.handle_list_delete(event);']]
+                            attributes: [['onclick', 'TTBox.get("events").handle_list_delete(event);']]
                         })
                     ],
                     parent: $props_ul

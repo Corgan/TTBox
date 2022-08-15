@@ -1,11 +1,8 @@
-import BlockManager from '../block_manager.mjs';
+import TTBox from '../ttbox.mjs';
 import StatBlock from './block.mjs';
 import { createElement } from './../helpers.mjs';
 
 export default class TextBlock extends StatBlock {
-    static {
-        BlockManager.register(this);
-    }
     constructor({text, ...args}={}) {
         super({id: 'text', ...args});
         this.text = text;

@@ -1,11 +1,8 @@
-import BlockManager from '../block_manager.mjs';
+import TTBox from '../ttbox.mjs';
 import StatBlock from './block.mjs';
 import { createElement } from './../helpers.mjs';
 
 export default class HeirloomsBlock extends StatBlock {
-    static {
-        BlockManager.register(this);
-    }
     constructor({...args}={}) {
         super({id: 'heirlooms', ...args});
     }

@@ -5,7 +5,6 @@
         <link rel="stylesheet" type="text/css" href="/css/style.css">
         <link rel="stylesheet" type="text/css" href="/mods/ttbox/ttbox.css">
         <link rel="stylesheet" type="text/css" href="/mods/mods.css">
-        <script id="TTBox-Script" src="/mods/ttbox.mjs" type="module" crossorigin="anonymous"></script>
     </head>
     <body>
         <div id="wrapper">
@@ -33,6 +32,8 @@
                 let contentWidth = document.getElementById('content').offsetWidth;
                 let contentHeight = document.getElementById('titlebar').offsetHeight + document.getElementById('content').offsetHeight;
 
+                
+
                 if(contentWidth > win.width)
                     win.resizeTo(contentWidth, win.height);
                 if(contentHeight > win.height)
@@ -41,23 +42,9 @@
                 win.setMinimumSize(contentWidth, contentHeight);
             });
             mObserver.observe(document.body, {attributes: true, childList: true, subtree: true});
-            
-
         </script>
         <script type="module">
-            import { getTT } from './helpers.mjs';
-            import BlockManager from './block_manager.mjs';
-            import EventManager from './event_manager.mjs';
-
-            import BionicMapBlock from './blocks/bw.mjs';
-            import Challenge2Block from './blocks/c2s.mjs';
-            import DailyBlock from './blocks/daily.mjs';
-            import HeirloomsBlock from './blocks/heirlooms.mjs';
-            import InfoBlock from './blocks/info.mjs';
-            import MapsBlock from './blocks/maps.mjs';
-            import PlayerSpireBlock from './blocks/playerspire.mjs';
-            import TextBlock from './blocks/text.mjs';
-            import VoidsBlock from './blocks/voids.mjs';
+            import TTBox from './ttbox.mjs';
 
             let gameWindow = (await (new Promise(resolve => nw.Window.getAll(a => resolve(a))))).find(w => w.window.location.href.match("/index.html")).window;
 
@@ -70,13 +57,21 @@
                 enumerable: false,
                 get: () => gameWindow
             });
-            
-            (await getTT()).window.location.reload();
 
-            EventManager.start(await getTT());
-            BlockManager.start();
-            window.BlockManager = BlockManager;
-            window.addEventListener('beforeunload', (e) => BlockManager.save());
+            Object.defineProperty(window, 'TTBox', {
+                enumerable: false,
+                get: () => TTBox
+            });
+
+            Object.defineProperty(window, 'TTBlocks', {
+                enumerable: false,
+                get: () => TTBox.get('blocks')
+            });
+
+            Object.defineProperty(window, 'TTEvents', {
+                enumerable: false,
+                get: () => TTBox.get('events')
+            });
         </script>
     </body>
 </html>

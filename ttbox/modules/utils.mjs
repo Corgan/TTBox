@@ -1,7 +1,8 @@
 import TTModule from './module.mjs';
+import TTBox from './../ttbox.mjs';
 
 export default class UtilsModule extends TTModule {
-    constructor() { if(this.constructor) return this.constructor; }
+    constructor() { super(); }
     static id = 'utils';
 
     static async start() {

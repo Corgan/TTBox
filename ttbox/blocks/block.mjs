@@ -1,4 +1,4 @@
-import BlockManager from '../block_manager.mjs';
+import TTBox from '../ttbox.mjs';
 import { createElement } from './../helpers.mjs';
 
 export default class StatBlock {
@@ -31,13 +31,13 @@ export default class StatBlock {
                         createElement('span', {
                             classList: ['title-collapse', 'icon-eye2'],
                             attributes: [
-                                ['onclick', `BlockManager.get("${id}").toggle();`]
+                                ['onclick', `TTBox.get("blocks").get("${id}").toggle();`]
                             ]
                         }),
                         createElement('span', {
                             classList: ['title-configure', 'icon-tools'],
                             attributes: [
-                                ['onclick', `BlockManager.get("${id}").configure();`]
+                                ['onclick', `TTBox.get("blocks").get("${id}").configure();`]
                             ]
                         })
                     ]
@@ -122,7 +122,7 @@ export default class StatBlock {
         this.$el.classList.toggle('resizing', this.resizing);
         this.$el.classList.toggle('configuring', this.configuring);
         if(this.resizing) {
-            gameWindow.swapClass('direction', 'direction-' + BlockManager.direction, this.$el);
+            gameWindow.swapClass('direction', 'direction-' + TTBox.get("blocks").direction, this.$el);
         } else {
             gameWindow.swapClass('direction', 'direction-none', this.$el);
         }
@@ -143,18 +143,18 @@ export default class StatBlock {
     move(x, y) {
         if(x == this.x && y == this.y)
             return;
-        if(BlockManager.locked)
+        if(TTBox.get("blocks").locked)
             return;
             
         this.x = Math.max(1, x);
         this.y = Math.max(1, y);
 
-        BlockManager.redraw();
+        TTBox.get("blocks").redraw();
     }
     resize(h, w, x=this.x, y=this.y) {
         if(h == this.h && w == this.w && x == this.x && y == this.y)
             return;
-        if(this.collapsed || BlockManager.locked)
+        if(this.collapsed || TTBox.get("blocks").locked)
             return;
 
         this.x = Math.max(1, x);
@@ -163,7 +163,7 @@ export default class StatBlock {
         this.h = Math.max(1, h);
         this.w = Math.max(1, w);
 
-        BlockManager.redraw();
+        TTBox.get("blocks").redraw();
     }
     toggle(e) {
         if(this.collapsed) {
@@ -171,7 +171,7 @@ export default class StatBlock {
         } else {
             this.collapsed = true;
         }
-        BlockManager.redraw();
+        TTBox.get("blocks").redraw();
     }
     update_config() {
         let $children = [...this.$config.children];
@@ -213,6 +213,6 @@ export default class StatBlock {
             this.configuring = bool;
             this.update_config();
         }
-        BlockManager.redraw();
+        TTBox.get("blocks").redraw();
     }
 }

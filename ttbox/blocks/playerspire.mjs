@@ -1,11 +1,8 @@
-import BlockManager from '../block_manager.mjs';
+import TTBox from '../ttbox.mjs';
 import StatBlock from './block.mjs';
 import { createElement, chunks } from './../helpers.mjs';
 
 export default class PlayerSpireBlock extends StatBlock {
-    static {
-        BlockManager.register(this);
-    }
     constructor({...args}={}) {
         super({id: 'playerspire', ...args});
     }

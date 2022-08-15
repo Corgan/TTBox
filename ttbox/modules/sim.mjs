@@ -1,7 +1,8 @@
 import TTModule from './module.mjs';
+import TTBox from './../ttbox.mjs';
 
 export default class SimulatorModule extends TTModule {
-    constructor() { if(this.constructor) return this.constructor; }
+    constructor() { super(); }
 
     static id = 'sim';
 
@@ -113,18 +114,18 @@ export default class SimulatorModule extends TTModule {
 		}
 
         /* Coordinate */
-		if (challengeActive == "Coordinate") cell.health *= TTBox.instance.modules.utils.badCoordLevel(world);
+		if (challengeActive == "Coordinate") cell.health *= TTBox.modules.utils.badCoordLevel(world);
 
         /* Maps */
         if (mapsActive) {
             enemy.attack *= difficulty;
             enemy.health *= difficulty;
-			if (world >= TTBox.instance.modules.utils.corruptionStart({ ignoreCorrupted: true, ...arguments[0] })) {
-				if (TTBox.instance.modules.utils.magmaActive(...arguments) && location == "Void"){
+			if (world >= TTBox.modules.utils.corruptionStart({ ignoreCorrupted: true, ...arguments[0] })) {
+				if (TTBox.modules.utils.magmaActive(...arguments) && location == "Void"){
 					enemy.attack *= (mutations.Corruption.statScale(3)).toFixed(1);
 					enemy.health *= (mutations.Corruption.statScale(10)).toFixed(1);
 				}
-				else if (location == "Void" || TTBox.instance.modules.utils.magmaActive(...arguments)){
+				else if (location == "Void" || TTBox.modules.utils.magmaActive(...arguments)){
 					enemy.attack *= (mutations.Corruption.statScale(3) / 2).toFixed(1);
 					enemy.health *= (mutations.Corruption.statScale(10) / 2).toFixed(1);
 				}
@@ -211,7 +212,7 @@ export default class SimulatorModule extends TTModule {
 
         /* Improb/Omni */
         if (name == 'Improbability' || name == "Omnipotrimp") {
-            if (world >= TTBox.instance.modules.utils.corruptionStart({ ignoreCorrupted: true, ...arguments[0] })) {
+            if (world >= TTBox.modules.utils.corruptionStart({ ignoreCorrupted: true, ...arguments[0] })) {
                 if (spireActive) {
                     enemy.origHealth *= mutations.Corruption.statScale(10);
                     enemy.origAttack *= mutations.Corruption.statScale(3);

@@ -1,13 +1,21 @@
-class TTBox {
-    static { window.TTBox = this; };
-    
-    static script = document.getElementById('TTBox-Script');
+export default class TTBox {
+    static running = false;
+    static tick = 0;
+    static modules = {};
+
+    constructor() {
+        if(this.constructor)
+            return this.constructor;
+    }
 
     static modules = [
+        'blocks',
+        'events',
         //'sim',
         //'utils',
         //'maps',
     ];
+    static loadedModules = [];
 
     static {
         (async () => {
@@ -15,7 +23,7 @@ class TTBox {
                 await promise;
                 return this.loadModule(current);
             }, Promise.resolve());
-            //await this.start();
+            await this.start();
         })();
     };
 
@@ -28,57 +36,42 @@ class TTBox {
             requestAnimationFrame(async () => await this.loop());
     }
 
-    static async reload() {
-        let src = this.script.src.split('?')[0];
-        this.script.parentNode.removeChild(this.script);
-
-        var script = document.createElement('script');
-        script.id = 'TTBox-Script';
-        script.src = `${src}?version=${Number((new Date()))}`;
-        script.type = 'module';
-        script.setAttribute('crossorigin', 'anonymous');
-        document.head.appendChild(script);
-        this.script = script;
-    }
-
-    static running = false;
-    static tick = 0;
-    static modules = {};
-
-    constructor() {
-        if(this.constructor)
-            return this.constructor;
-    }
-
-
     /* MODULES */
     static async loadModule(module) {
-        if(this.modules[module])
-            return this.modules[module];
+        if(this.loadedModules[module])
+            return this.loadedModules[module];
 
         try {
-            let { default: importedModule } = await import(`./modules/${module}.mjs?version=${Number((new Date()))}`);
+            let { default: importedModule } = await import(`./modules/${module}.mjs`);
             if(importedModule)
-                this.modules[module] = new importedModule();
+                this.loadedModules[module] = new importedModule();
         } catch(e) {
-            this.modules[module] = false;
+            this.loadedModules[module] = false;
             console.log(`Error loading module ${module}`);
             console.log(e);
         }
 
-        if(this.modules[module] && this.running)
-            this.modules[module].start();
+        if(this.loadedModules[module] && this.running)
+            this.loadedModules[module].start();
         
-        return this.modules[module];
+        return this.loadedModules[module];
     }
 
     static async reloadModule(module) {
-        if(this.modules[module]) {
-            delete this.modules[module]; // This kills the module
-            this.modules[module] = undefined;
+        if(this.loadedModules[module]) {
+            delete this.loadedModules[module]; // This kills the module
+            this.loadedModules[module] = undefined;
         }
 
         return this.loadModule(module);
+    }
+
+    static get(module) {
+        if(this.loadedModules[module]) {
+            return this.loadedModules[module]; 
+        } else {
+            return false;
+        }
     }
 
 
@@ -86,7 +79,7 @@ class TTBox {
     static async start() {
         if(!this.running) {
             this.running = true;
-            let modules = Object.values(this.modules);
+            let modules = Object.values(this.loadedModules);
 
             await modules.reduce(async (p, mod) => {
                 await p;
@@ -100,14 +93,14 @@ class TTBox {
                 }
             }, Promise.resolve());
 
-            requestAnimationFrame(async () => await this.constructor.loop());
+            requestAnimationFrame(async () => await this.loop());
         }
     }
 
     static async stop() {
         if(this.running) {
             this.running = false;
-            let modules = Object.values(this.modules);
+            let modules = Object.values(this.loadedModules);
 
             await modules.reduce(async (p, mod) => {
                 await p;
@@ -126,7 +119,7 @@ class TTBox {
     static async update() {
         if(this.running) {
             this.tick++;
-            let modules = Object.values(this.modules);
+            let modules = Object.values(this.loadedModules);
             await modules.reduce(async (p, mod) => {
                 await p;
 
