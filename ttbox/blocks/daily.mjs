@@ -13,6 +13,8 @@ export default class DailyBlock extends StatBlock {
             id: `daily-${i}`,
             parent: this.$content
         }));
+        
+        this.initialized = true;
     }
     update() {
         super.update();

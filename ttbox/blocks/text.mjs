@@ -12,6 +12,8 @@ export default class TextBlock extends StatBlock {
         this.textDiv = createElement('span', {
             parent: this.$content
         });
+        
+        this.initialized = true;
     }
     update() {
         super.update();

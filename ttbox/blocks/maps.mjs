@@ -45,6 +45,8 @@ export default class MapsBlock extends StatBlock {
                 })
             ]
         }));
+        
+        this.initialized = true;
     }
     update() {
         super.update();

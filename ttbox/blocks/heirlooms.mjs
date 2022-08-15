@@ -39,6 +39,8 @@ export default class HeirloomsBlock extends StatBlock {
             id: `heirlooms-extra`,
             parent: this.$content
         });
+        
+        this.initialized = true;
     }
     update_icon(icon, heirloom, loc, idx=-1) {
         let h_icon = gameWindow.getHeirloomIcon(heirloom);

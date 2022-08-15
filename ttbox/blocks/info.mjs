@@ -12,6 +12,8 @@ export default class InfoBlock extends StatBlock {
     init() {
         super.init();
         this.props = this.props || [];
+        
+        this.initialized = true;
     }
     update() {
         super.update();

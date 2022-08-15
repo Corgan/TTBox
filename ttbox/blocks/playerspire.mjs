@@ -47,6 +47,8 @@ export default class PlayerSpireBlock extends StatBlock {
                 parent: this.spire_container
             })
         );
+        
+        this.initialized = true;
     }
     update() {
         super.update();

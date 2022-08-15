@@ -44,6 +44,8 @@ export default class Challenge2Block extends StatBlock {
                 })
             ]
         }));
+        
+        this.initialized = true;
     }
     update() {
         super.update();

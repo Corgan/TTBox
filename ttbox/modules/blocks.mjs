@@ -11,32 +11,29 @@ export default class Blocks extends TTModule {
     static running = false;
 
     static loadable = [
-        'bw', 'c2s', 'daily', 'heirlooms', 'info', 'maps', 'playerspire', 'text', 'voids'
+        'bw', 'c2s', 'daily', 'heirlooms', 'info', 'maps', 'playerspire', 'text', 'voids', 'world'
     ]
     static lookup = {};
-    static {
-        (async () => {
-            await this.loadable.reduce(async (promise, current, i) => {
-                await promise;
-                this.register(current);
-            }, Promise.resolve());
-        })();
-    }
     
     static types = {};
     static blocks = [];
 
+    static loaded = false;
     static ontop = false;
     static locked = false;
     static resizing = false;
     static dragging = false;
 
-    static {
-        window.addEventListener('beforeunload', (e) => this.save());
+    static async loadAll() {
+        await this.loadable.reduce(async (promise, current, i) => {
+            await promise;
+            await this.register(current);
+        }, Promise.resolve());
+        this.loaded = false;
     }
 
     static async register(block) {
-        if(!this.lookup[block]) {
+        if(!this.lookup[block] && this.loadable.includes(block)) {
             let { default: importedModule } = await import(`./../blocks/${block}.mjs`);
 
             if(importedModule && importedModule.name)
@@ -58,6 +55,7 @@ export default class Blocks extends TTModule {
     }
 
     static save(store=true) {
+        if(!this.loaded) return;
         let saveObj = {}
 
         saveObj.blocks = this.blocks.map(b => b.save());
@@ -70,16 +68,22 @@ export default class Blocks extends TTModule {
         return saveObj;
     }
 
-    static load(override=false, reset=false) {
-        let lsString = (!reset && localStorage.getItem('TrimpToolbox-Configuration')) || JSON.stringify(DefaultConfig);
-        let saveObj = override || JSON.parse(lsString);
+    static async load(override=false, reset=false) {
+        let lsString = localStorage.getItem('TrimpToolbox-Configuration');
+        let lString = (!reset && lsString) || JSON.stringify(DefaultConfig);
+        let saveObj = override || JSON.parse(lString);
+
+        if(!this.loaded)
+            await this.loadAll();
         
         saveObj.blocks.forEach(b => {
             let block = this.get(b.id);
             if(!block) {
                 block = this.new(b);
-                if(block)
+                if(block) {
+                    block.init();
                     this.blocks.push(block);
+                }
             } else {
                 block.load(b);
                 block.update_config();
@@ -88,12 +92,14 @@ export default class Blocks extends TTModule {
 
         this.ontop = saveObj.ontop || false;
         this.locked = saveObj.locked || false;
+
+        this.loaded = true;
         this.redraw();
     }
 
     static async start() {
         await super.start(...arguments);
-        this.load();
+        await this.load();
 
         this.$dev = document.getElementById("dev");
         this.$reload = document.getElementById("reload");
@@ -143,7 +149,7 @@ export default class Blocks extends TTModule {
         win.setResizable(true);// !this.locked; Setting resizable to true after being set to false doesn't seem to work?
 
 
-        this.blocks.forEach(block => (block.init(), block.update()));
+        this.blocks.forEach(block => block.update());
 
         this.redraw();
 
@@ -175,7 +181,7 @@ export default class Blocks extends TTModule {
             gameWindow.swapClass('direction', 'direction-none', document.body);
         }
         this.blocks.forEach(block => block.redraw());
-        
+
         this.save();
     }
 

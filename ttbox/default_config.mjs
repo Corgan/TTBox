@@ -3,6 +3,28 @@ export default {
   locked: false,
   blocks: [
     {
+      id: "c2s",
+      title: "Challenge2s",
+      x: 1,
+      y: 1,
+      w: 43,
+      h: 8,
+      z: 0,
+      collapsed: false,
+      type: "Challenge2Block"
+    },
+    {
+      id: "world",
+      title: "World",
+      x: 1,
+      y: 1,
+      w: 43,
+      h: 8,
+      z: 0,
+      collapsed: false,
+      type: "WorldBlock"
+    },
+    {
       id: "daily",
       title: "Daily Status",
       x: 1,

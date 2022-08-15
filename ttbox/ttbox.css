@@ -453,6 +453,25 @@ input[type="text"] {
     column-gap: 25px;
 }
 
+#content > #world .stat-content {
+    grid-auto-rows: 1fr;
+}
+
+#content > #world .stat-content #world-grid {
+    display: grid;
+    padding: 1px;
+    gap: 1px;
+    grid-auto-rows: 1fr;
+    grid-template-columns: repeat(10, 1fr);
+    background-color: #dadada;
+    height: 100%;
+}
+
+#content > #world .stat-content #world-grid .world-cell {
+    display: inline-block;
+    position: relative;
+}
+
 #content > #playerspire .stat-content {
     grid-auto-columns: 1fr;
     grid-template-rows: 1fr 4fr 1fr;

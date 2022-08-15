@@ -76,6 +76,7 @@ export default class StatBlock {
         this.dragging = false;
         this.resizing = false;
         this.configuring = false;
+        this.initialized = false;
         this.h = h;
         this.w = w;
         this.x = x;
