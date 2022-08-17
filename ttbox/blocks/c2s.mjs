@@ -3,47 +3,50 @@ import StatBlock from './block.mjs';
 import { createElement } from './../helpers.mjs';
 
 export default class Challenge2Block extends StatBlock {
+    static type = 'Challenge2s';
     constructor({...args}={}) {
         super({id: 'c2s', ...args});
     }
     init() {
         super.init();
-        this.$header = createElement('div', {
-            classList: ['key-value'],
-            id: `c2s-header`,
-            parent: this.$content,
-            children: [
-                createElement('span', {
-                    classList: ['name'],
-                    text: "Challenge"
-                }),
-                createElement('span', {
-                    classList: ['hze'],
-                    text: "HZE"
-                }),
-                createElement('span', {
-                    classList: ['bonus'],
-                    text: "Bonus %"
-                })
-            ]
-        })
+        if(!this.$header)
+            this.$header = createElement('div', {
+                classList: ['key-value'],
+                id: `c2s-header`,
+                parent: this.$content,
+                children: [
+                    createElement('span', {
+                        classList: ['name'],
+                        text: "Challenge"
+                    }),
+                    createElement('span', {
+                        classList: ['hze'],
+                        text: "HZE"
+                    }),
+                    createElement('span', {
+                        classList: ['bonus'],
+                        text: "Bonus %"
+                    })
+                ]
+            })
 
-        this.$challenges = Object.entries(game.c2).map(([c2, hze], i) => createElement('div', {
-            classList: ['key-value'],
-            id: `c2s-entry-${i}`,
-            parent: this.$content,
-            children: [
-                createElement('span', {
-                    classList: ['name']
-                }),
-                createElement('span', {
-                    classList: ['hze'],
-                }),
-                createElement('span', {
-                    classList: ['bonus'],
-                })
-            ]
-        }));
+        if(!this.$challenges)
+            this.$challenges = Object.entries(game.c2).map(([c2, hze], i) => createElement('div', {
+                classList: ['key-value'],
+                id: `c2s-entry-${i}`,
+                parent: this.$content,
+                children: [
+                    createElement('span', {
+                        classList: ['name']
+                    }),
+                    createElement('span', {
+                        classList: ['hze'],
+                    }),
+                    createElement('span', {
+                        classList: ['bonus'],
+                    })
+                ]
+            }));
         
         this.initialized = true;
     }

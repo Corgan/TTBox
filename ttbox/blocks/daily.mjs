@@ -3,23 +3,25 @@ import StatBlock from './block.mjs';
 import { createElement } from './../helpers.mjs';
 
 export default class DailyBlock extends StatBlock {
+    static namtypee = 'Daily Status';
     constructor({...args}={}) {
         super({id: 'daily', ...args});
     }
     init() {
         super.init();
-        this.week = this.dailies.map((day, i) => createElement('div', {
-            classList: ['noselect',  'lowPad', 'dailyTop', (day.done ? 'colorGrey' : 'colorSuccess')],
-            id: `daily-${i}`,
-            parent: this.$content
-        }));
+        if(!this.$week)
+            this.$week = this.dailies.map((day, i) => createElement('div', {
+                classList: ['noselect',  'lowPad', 'dailyTop', (day.done ? 'colorGrey' : 'colorSuccess')],
+                id: `daily-${i}`,
+                parent: this.$content
+            }));
         
         this.initialized = true;
     }
     update() {
         super.update();
         this.dailies.forEach((day, i) => {
-            let item = this.week[i];
+            let item = this.$week[i];
             let update = false;
             if(!item.getAttribute('data-value'))
                 update = true;

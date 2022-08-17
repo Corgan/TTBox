@@ -1,8 +1,10 @@
 import TTBox from '../ttbox.mjs';
 import StatBlock from './block.mjs';
+import Configuration from '../configuration.mjs';
 import { createElement } from './../helpers.mjs';
 
 export default class InfoBlock extends StatBlock {
+    static type = 'Info Block';
     constructor({...args}={}) {
         super({id: 'info', ...args});
         let { props } = args;
@@ -61,112 +63,22 @@ export default class InfoBlock extends StatBlock {
     }
     save() {
         let ret = super.save();
-        ret.props = this.props;
+        ret.props = this.props || [];
         return ret;
     }
-    load(data) {
+    load(data={}) {
         super.load(data);
-        this.props = data.props;
+        this.props = data.props = [];
     }
     update_config() {
         super.update_config();
+
         let $children = [...this.$config.children];
 
         let $props = $children.find(el => el.classList.contains('config-props'));
         if(!$props)
-            $props = createElement('div', {
-                parent: this.$config,
-                classList: ['config', 'config-props'],
-                attributes: [['data-config', 'props']],
-                children: [
-                    createElement('span', {
-                        text: "Props"
-                    }),
-                    createElement('div', {
-                        classList: ['list-container'],
-                        children: [
-                            createElement('div', {
-                                classList: ['list']
-                            }),
-                            createElement('div', {
-                                classList: ['add'],
-                                attributes: [['onclick', 'TTBox.get("events").handle_list_add(event);']],
-                                children: [
-                                    createElement('span', { classList: ['icon-plus'] })
-                                ]
-                            })
-                        ]
-                    })
-                ]
-            });
-
-        let [ $label, $props_container ] = [...$props.children];
-        let [ $props_ul, $add_prop ] = [...$props_container.children];
-
-        let max = Math.max($props_ul.children.length, this.props.length);
-        let props = this.props.map(p => this.constructor.props.find(pr => pr.id == p));
-
-        for(let i=0; i<max; i++) {
-            let $el = $props_ul.children[i];
-            if(!$el) {
-                $el = createElement('div', {
-                    classList: ['list-item'],
-                    children: [
-                        createElement('div', {
-                            classList: ['draggable'],
-                            attributes: [['draggable', true]],
-                            children: [
-                                createElement('span', { classList: ['icon-menu'] })
-                            ]
-                        }),
-                        createElement('div', {
-                            classList:  ['dropdown'],
-                            attributes: [['onclick', 'this.classList.toggle("open");']],
-                            children: [
-                                createElement('div', {
-                                    classList: ['dropdown-entry'],
-                                    text: props[i].name,
-                                    attributes: [['data-id', props[i].id]]
-                                }),
-                                createElement('div', {
-                                    classList: ['dropdown-content'],
-                                    children: this.constructor.props.map(prop => createElement('div', {
-                                        classList: ['dropdown-entry'],
-                                        text: prop.name,
-                                        attributes: [['data-id', prop.id], ['onclick', 'TTBox.get("events").handle_list_update(event);']]
-                                    }))
-                                })
-                            ]
-                        }),
-                        createElement('div', {
-                            classList: ['delete'],
-                            children: [
-                                createElement('span', { classList: ['icon-minus'] })
-                            ],
-                            attributes: [['onclick', 'TTBox.get("events").handle_list_delete(event);']]
-                        })
-                    ],
-                    parent: $props_ul
-                });
-            }
-
-            let prop = props[i];
-            
-            if(!prop) {
-                $el.classList.add('hide');
-            } else {
-                $el.classList.remove('hide');
-                let [ $draggable, $dropdown, $delete ] = [...$el.children];
-                let [ $current, $entries ] = [...$dropdown.children];
-                if($current.getAttribute('data-id') != prop.id) {
-                    $current.setAttribute('data-id', prop.id);
-                    $current.textContent = prop.name;
-                }
-                [...$entries.children].forEach(entry => {
-                    entry.classList.toggle('hide', entry.getAttribute('data-id') == prop.id);
-                });
-            }
-        }
+            this.$config.appendChild(Configuration.render_list('props', "Props", this, $props));
+        $props = Configuration.render_list('props', "Props", this, $props);
     }
     static props = [
         { id: "hze", name: "HZE", fn: () => game.global.highestLevelCleared },

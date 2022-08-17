@@ -3,55 +3,58 @@ import StatBlock from './block.mjs';
 import { createElement } from './../helpers.mjs';
 
 export default class MapsBlock extends StatBlock {
+    static type = 'Prestige Items';
     constructor({...args}={}) {
         super({id: 'maps', ...args});
     }
     init() {
         super.init();
-        createElement('div', {
-            classList: ['key-value'],
-            id: `map-level-header`,
-            parent: this.$content,
-            children: [
-                createElement('span', {
-                    classList: ['level'],
-                    text: "Map Level"
-                }),
-                createElement('span', {
-                    classList: ['items'],
-                    text: "Items"
-                }),
-                createElement('span', {
-                    classList: ['frags'],
-                    text: "Fragments"
-                })
-            ]
-        });
+        if(!this.$header)
+            this.$header = createElement('div', {
+                classList: ['key-value'],
+                id: `map-level-header`,
+                parent: this.$content,
+                children: [
+                    createElement('span', {
+                        classList: ['level'],
+                        text: "Map Level"
+                    }),
+                    createElement('span', {
+                        classList: ['items'],
+                        text: "Items"
+                    }),
+                    createElement('span', {
+                        classList: ['frags'],
+                        text: "Fragments"
+                    })
+                ]
+            });
 
-        this.maps = [...Array(21).keys()].map(i => createElement('div', {
-            classList: ['key-value', 'hide'],
-            id: `map-level-${i}`,
-            parent: this.$content,
-            children: [
-                createElement('span', {
-                    classList: ['level'],
-                    text: `${i - 10 > 0 ? '+'+(i-10) : (i-10)}`
-                }),
-                createElement('span', {
-                    classList: ['items']
-                }),
-                createElement('span', {
-                    classList: ['frags', 'mapExtraNoAfford']
-                })
-            ]
-        }));
+        if(!this.$maps)
+            this.$maps = [...Array(21).keys()].map(i => createElement('div', {
+                classList: ['key-value', 'hide'],
+                id: `map-level-${i}`,
+                parent: this.$content,
+                children: [
+                    createElement('span', {
+                        classList: ['level'],
+                        text: `${i - 10 > 0 ? '+'+(i-10) : (i-10)}`
+                    }),
+                    createElement('span', {
+                        classList: ['items']
+                    }),
+                    createElement('span', {
+                        classList: ['frags', 'mapExtraNoAfford']
+                    })
+                ]
+            }));
         
         this.initialized = true;
     }
     update() {
         super.update();
         this.prestiges.forEach((v, i) => {
-            let item = this.maps[i];
+            let item = this.$maps[i];
             item.classList.toggle('hide', v <= 0);
 
             if(item.getAttribute('data-value') != v) {

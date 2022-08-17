@@ -86,6 +86,8 @@
             }
 
             window.hideTT = function() {
+                document.getElementById('content').innerHTML = '';
+                
                 let win = nw.Window.get();
                 win.moveTo(9999, 9999);
             }

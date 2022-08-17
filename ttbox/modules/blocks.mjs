@@ -1,5 +1,6 @@
 import TTBox from './../ttbox.mjs';
 import TTModule from './module.mjs';
+import StatBlock from '../blocks/block.mjs';
 
 import { createElement } from './../helpers.mjs';
 import DefaultConfig from './../default_config.mjs';
@@ -11,9 +12,11 @@ export default class Blocks extends TTModule {
     static running = false;
 
     static loadable = [
-        'bw', 'c2s', 'daily', 'heirlooms', 'info', 'maps', 'playerspire', 'text', 'voids', 'world'
-    ]
+        'bw', 'c2s', 'daily', 'heirlooms', 'info', 'maps', 'playerspire', 'text', 'voids', 'world', 'map', 'universe'
+    ];
     static lookup = {};
+    static reverseLookup = {};
+    static byClass = {};
     
     static types = {};
     static blocks = [];
@@ -36,22 +39,48 @@ export default class Blocks extends TTModule {
         if(!this.lookup[block] && this.loadable.includes(block)) {
             let { default: importedModule } = await import(`./../blocks/${block}.mjs`);
 
-            if(importedModule && importedModule.name)
+            if(importedModule && importedModule.name) {
                 this.lookup[block] = importedModule.name;
+                this.byClass[importedModule.name] = importedModule;
+                this.reverseLookup[importedModule.name] = block;
+            }
             
             this.types[this.lookup[block]] = importedModule;
         }
     }
 
-    static new(data) {
+    static new(data={}) {
+        let block;
         if(data.type && this.types[data.type]) {
-            let block = new (this.types[data.type])(data);
-            block.load(data);
-            block.update_config();
-            return block;
+            block = new (this.types[data.type])(data);
         } else {
-            return false;
+            block = new StatBlock(data);
         }
+        block.init();
+        this.blocks.push(block);
+        block.update_config();
+        return block;
+    }
+
+    static delete(id, force=false) {
+        if(!id || typeof id != "string" || (!force && this.locked))
+            return;
+
+        let idx = this.blocks.findIndex(block => block.id == id);
+        let [ block ] = this.blocks.splice(idx, 1);
+        block.delete();
+        this.redraw();
+    }
+
+    static change_type(id, type) {
+        let block = this.get(id);
+        let old = block.save();
+        this.delete(id, true);
+        block = this.new({...old, type: type});
+        block.configuring = true;
+        block.update_config();
+        Blocks.redraw();
+        return block;
     }
 
     static save(store=true) {
@@ -78,12 +107,8 @@ export default class Blocks extends TTModule {
         
         saveObj.blocks.forEach(b => {
             let block = this.get(b.id);
-            if(!block) {
+            if(!block || block.constructor.name != b.type) {
                 block = this.new(b);
-                if(block) {
-                    block.init();
-                    this.blocks.push(block);
-                }
             } else {
                 block.load(b);
                 block.update_config();
@@ -107,6 +132,7 @@ export default class Blocks extends TTModule {
         this.$pause = document.getElementById("pause");
         this.$pauseAT = document.getElementById("pauseAT");
         this.$lock = document.getElementById("lock");
+        this.$add = document.getElementById("add");
 
 
         this.$pin.classList.toggle('on', this.ontop);
@@ -142,6 +168,7 @@ export default class Blocks extends TTModule {
             gameWindow.swapClass('icon-', this.locked ? "icon-lock" : "icon-lock-open", this.$lock);
             this.redraw();
         });
+        this.$add.addEventListener('click', () => Blocks.new());
 
         
         let win = nw.Window.get();

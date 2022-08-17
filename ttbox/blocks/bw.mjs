@@ -3,47 +3,50 @@ import StatBlock from './block.mjs';
 import { createElement } from './../helpers.mjs';
 
 export default class BionicMapBlock extends StatBlock {
+    static type = 'Bionic Maps';
     constructor({...args}={}) {
         super({id: 'bw', ...args});
     }
     init() {
         super.init();
-        createElement('div', {
-            classList: ['key-value'],
-            id: `map-level-header`,
-            parent: this.$content,
-            children: [
-                createElement('span', {
-                    classList: ['level'],
-                    text: "BW"
-                }),
-                createElement('span', {
-                    classList: ['items'],
-                    text: "Items"
-                })
-            ]
-        })
+        if(!this.$header)
+            this.$header = createElement('div', {
+                classList: ['key-value'],
+                id: `map-level-header`,
+                parent: this.$content,
+                children: [
+                    createElement('span', {
+                        classList: ['level'],
+                        text: "BW"
+                    }),
+                    createElement('span', {
+                        classList: ['items'],
+                        text: "Items"
+                    })
+                ]
+            });
 
-        this.maps = [...Array(4).keys()].map(i => createElement('div', {
-            classList: ['key-value'],
-            id: `map-level-${i}`,
-            parent: this.$content,
-            children: [
-                createElement('span', {
-                    classList: ['level']
-                }),
-                createElement('span', {
-                    classList: ['items'],
-                })
-            ]
-        }));
+        if(!this.$maps)
+            this.$maps = [...Array(4).keys()].map(i => createElement('div', {
+                classList: ['key-value'],
+                id: `map-level-${i}`,
+                parent: this.$content,
+                children: [
+                    createElement('span', {
+                        classList: ['level']
+                    }),
+                    createElement('span', {
+                        classList: ['items'],
+                    })
+                ]
+            }));
         
         this.initialized = true;
     }
     update() {
         super.update();
         this.bw.forEach((v, i) => {
-            let item = this.maps[i];
+            let item = this.$maps[i];
             item.classList.toggle('hide', v <= 0 || game.global.world + 10 == ((game.global.bionicOwned - 2 + i) * 15 + 110));
             if(item.getAttribute('data-value') != v) {
                 item.children[0].textContent = `${((game.global.bionicOwned - 2 + i) * 15 + 110)}`;

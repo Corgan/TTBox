@@ -3,82 +3,87 @@ import StatBlock from './block.mjs';
 import { createElement } from './../helpers.mjs';
 
 export default class VoidsBlock extends StatBlock {
+    static type = 'Void Maps';
     constructor({...args}={}) {
         super({id: 'voids', ...args});
     }
     init() {
         super.init();
-        this.$header = createElement('div', {
-            classList: ['key-value'],
-            id: `void-header`,
-            parent: this.$content,
-            children: [
-                createElement('span', {
-                    classList: ['prefix'],
-                    text: "Prefix"
-                }),
-                createElement('span', {
-                    classList: ['suffix'],
-                    text: "Suffix"
-                }),
-                createElement('span', {
-                    classList: ['stack'],
-                    text: "Stacks"
-                }),
-                createElement('span', {
-                    classList: ['he'],
-                    text: "He"
-                })
-            ]
-        });
+        if(!this.$header)
+            this.$header = createElement('div', {
+                classList: ['key-value'],
+                id: `void-header`,
+                parent: this.$content,
+                children: [
+                    createElement('span', {
+                        classList: ['prefix'],
+                        text: "Prefix"
+                    }),
+                    createElement('span', {
+                        classList: ['suffix'],
+                        text: "Suffix"
+                    }),
+                    createElement('span', {
+                        classList: ['stack'],
+                        text: "Stacks"
+                    }),
+                    createElement('span', {
+                        classList: ['he'],
+                        text: "He"
+                    })
+                ]
+            });
 
-        this.$total = createElement('div', {
-            classList: ['key-value'],
-            id: `void-vm-total`,
-            parent: this.$content,
-            children: [
-                createElement('span', {
-                    classList: ['prefix'],
-                    text: `Total`
-                }),
-                createElement('span', {
-                    classList: ['suffix']
-                }),
-                createElement('span', {
-                    classList: ['stack']
-                }),
-                createElement('span', {
-                    classList: ['he']
-                })
-            ]
-        })
+        if(!this.$total)
+            this.$total = createElement('div', {
+                classList: ['key-value'],
+                id: `void-vm-total`,
+                parent: this.$content,
+                children: [
+                    createElement('span', {
+                        classList: ['prefix'],
+                        text: `Total`
+                    }),
+                    createElement('span', {
+                        classList: ['suffix']
+                    }),
+                    createElement('span', {
+                        classList: ['stack']
+                    }),
+                    createElement('span', {
+                        classList: ['he']
+                    })
+                ]
+            })
 
-        this.$vm_container = createElement('div', {
-            classList: ['map-container'],
-            parent: this.$content,
-        });
+        if(!this.$vm_container)
+            this.$vm_container = createElement('div', {
+                classList: ['map-container'],
+                parent: this.$content,
+            });
 
-        this.$vms = this.names.map((name, i) => createElement('div', {
-            classList: ['key-value'],
-            id: `void-vm-${name.toLowerCase().replace(' ', '-')}`,
-            parent: this.$vm_container,
-            children: [
-                createElement('span', {
-                    classList: ['prefix'],
-                    text: `${name.split(' ')[0]}`
-                }),
-                createElement('span', {
-                    classList: ['suffix'],
-                    text: `${name.split(' ')[1]}`
-                }),
-                createElement('span', {
-                    classList: ['stack']
-                }),
-                createElement('span', {
-                    classList: ['he']
-                })
-            ]
-        }));
+        if(!this.$vms)
+            this.$vms = this.constructor.names.map((name, i) => createElement('div', {
+                classList: ['key-value'],
+                id: `void-vm-${name.toLowerCase().replace(' ', '-')}`,
+                parent: this.$vm_container,
+                children: [
+                    createElement('span', {
+                        classList: ['prefix'],
+                        text: `${name.split(' ')[0]}`
+                    }),
+                    createElement('span', {
+                        classList: ['suffix'],
+                        text: `${name.split(' ')[1]}`
+                    }),
+                    createElement('span', {
+                        classList: ['stack']
+                    }),
+                    createElement('span', {
+                        classList: ['he']
+                    })
+                ]
+            }));
         
         this.initialized = true;
     }
@@ -230,11 +235,11 @@ export default class VoidsBlock extends StatBlock {
         return amt;
     }
     
-    prefixes = ['Deadly', 'Poisonous', 'Heinous', 'Destructive'];
-    suffixes = ['Nightmare', 'Void', 'Descent', 'Pit'];
-    names = this.suffixes.flatMap(suffix => this.prefixes.map(prefix => `${prefix} ${suffix}`));
+    static get prefixes() { return ['Deadly', 'Poisonous', 'Heinous', 'Destructive']; }
+    static get suffixes() { return ['Nightmare', 'Void', 'Descent', 'Pit']; }
+    static get names() { return this.suffixes.flatMap(suffix => this.prefixes.map(prefix => `${prefix} ${suffix}`)); }
     get maps() {
-        return this.names.map(name => {
+        return this.constructor.names.map(name => {
             let map = game.global.mapsOwnedArray.find(owned => owned.name == name) || { name: name };
             let $el = this.$vms.find(node => node.id == `void-vm-${name.toLowerCase().replace(' ', '-')}`) || false;
             return {

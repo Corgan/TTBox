@@ -1,5 +1,6 @@
 import TTBox from '../ttbox.mjs';
 import TTModule from './module.mjs';
+import Blocks from './blocks.mjs';
 
 import { createElement, getTT } from './../helpers.mjs';
 
@@ -10,63 +11,66 @@ export default class Events extends TTModule {
     constructor() { super(); }
     static id = 'events';
     static running = false;
+    static offsetX = 0;
+    static offsetY = 0;
+    static dragging = false;
+    static resizing = false;
+    static direction = false;
+
     static async start() {
         await super.start(...arguments);
-        this.tt = await getTT();
-        this.dragging = false;
-        this.resizing = false;
-        this.direction = false;
+        Events.tt = await getTT();
 
-        document.body.addEventListener('dragstart', this.handle_mouse_event, true);
-        document.body.addEventListener('dragover', this.handle_mouse_event, true);
-        document.body.addEventListener('drop', this.handle_mouse_event, true);
-        document.body.addEventListener('mouseup', this.handle_mouse_event, true);
-        document.body.addEventListener('mouseover', this.handle_mouse_event, true);
-        document.body.addEventListener('mouseenter', this.handle_mouse_event, true);
-        document.body.addEventListener('mouseout', this.handle_mouse_event, true);
-        document.body.addEventListener('mousemove', this.handle_mouse_event, true);
-        document.body.addEventListener('mousedown', this.handle_mouse_event, true);
+        document.body.addEventListener('dragstart', Events.handle_mouse_event, true);
+        document.body.addEventListener('dragover', Events.handle_mouse_event, true);
+        document.body.addEventListener('drop', Events.handle_mouse_event, true);
+        document.body.addEventListener('mouseup', Events.handle_mouse_event, true);
+        document.body.addEventListener('mouseover', Events.handle_mouse_event, true);
+        document.body.addEventListener('mouseenter', Events.handle_mouse_event, true);
+        document.body.addEventListener('mouseout', Events.handle_mouse_event, true);
+        document.body.addEventListener('mousemove', Events.handle_mouse_event, true);
+        document.body.addEventListener('mousedown', Events.handle_mouse_event, true);
 
-        this.tt.window.location.reload();
+        Events.tt.window.location.reload();
     }
 
     static handle_mouse_event(event) {
         if(event.type == "mouseout") {
             if((event.toElement == null || event.toElement == document.documentElement) && event.fromElement.id == "content") {
-                if(this.dragging)
-                    this.dragging.dragging = false;
-                if(this.resizing)
-                    this.resizing.resizing = false;
-                this.dragging = false;
-                this.resizing = false;
-                this.direction = false;
-                TTBox.get('blocks').resizing = false;
-                TTBox.get('blocks').dragging = false;
+                if(Events.dragging)
+                    Events.dragging.dragging = false;
+                if(Events.resizing)
+                    Events.resizing.resizing = false;
+                Events.dragging = false;
+                Events.resizing = false;
+                Events.direction = false;
+                Blocks.resizing = false;
+                Blocks.dragging = false;
             }
         }
 
         if(event.target.classList.contains('resizer')) {
             if(event.type == "mousedown") {
                 let stat = event.composedPath().find(n => n.classList && n.classList.contains('stat'));
-                this.resizing = TTBox.get('blocks').get(stat.id);
-                this.resizing.resizing = true;
+                Events.resizing = Blocks.get(stat.id);
+                Events.resizing.resizing = true;
                 let [ _, direction ] = [...event.target.classList];
-                this.direction = direction;
-                TTBox.get('blocks').resizing = true;
-                TTBox.get('blocks').direction = direction;
+                Events.direction = direction;
+                Blocks.resizing = true;
+                Blocks.direction = direction;
             }
         }
 
-        if(event.type == "mouseup" && this.resizing) {
-            this.resizing.resizing = false;
-            this.resizing = false;
-            this.direction = false;
-            TTBox.get('blocks').resizing = false;
-            TTBox.get('blocks').direction = false;
-            TTBox.get('blocks').redraw();
+        if(event.type == "mouseup" && Events.resizing) {
+            Events.resizing.resizing = false;
+            Events.resizing = false;
+            Events.direction = false;
+            Blocks.resizing = false;
+            Blocks.direction = false;
+            Blocks.redraw();
         }
 
-        if(event.type == "mousemove" && this.resizing) {
+        if(event.type == "mousemove" && Events.resizing) {
             let { type, target } = event;
             if(event.x == 0 && event.y == 0)
                 return;
@@ -82,37 +86,37 @@ export default class Events extends TTModule {
             let gridX = Math.round(x/(GRID_SIZE + GRID_GAP));
             let gridY = Math.round(y/(GRID_SIZE + GRID_GAP));
 
-            let { x: oX, y: oY, h: oH, w: oW } = this.resizing;
-            let { x: nX, y: nY, h: nH, w: nW } = this.resizing;
+            let { x: oX, y: oY, h: oH, w: oW } = Events.resizing;
+            let { x: nX, y: nY, h: nH, w: nW } = Events.resizing;
 
-            if((this.direction == "top" || this.direction == "top-left" || this.direction == "top-right") && gridY > 0) {
+            if((Events.direction == "top" || Events.direction == "top-left" || Events.direction == "top-right") && gridY > 0) {
                 nY = gridY;
                 nH = oH + (oY - nY);
             }
 
-            if(this.direction == "bottom" || this.direction == "bottom-left" || this.direction == "bottom-right") {
+            if(Events.direction == "bottom" || Events.direction == "bottom-left" || Events.direction == "bottom-right") {
                 nH = gridY - oY + 1;
             }
 
-            if((this.direction == "left" || this.direction == "top-left" || this.direction == "bottom-left") && gridX > 0) {
+            if((Events.direction == "left" || Events.direction == "top-left" || Events.direction == "bottom-left") && gridX > 0) {
                 nX = gridX;
                 nW = oW + (oX - nX);
             }
 
-            if(this.direction == "right" || this.direction == "top-right" || this.direction == "bottom-right") {
+            if(Events.direction == "right" || Events.direction == "top-right" || Events.direction == "bottom-right") {
                 nW = gridX - oX + 1;
             }
 
-            this.resizing.resize(nH, nW, nX, nY);
+            Events.resizing.resize(nH, nW, nX, nY);
         }
 
         if(event.type == "mousedown") {
             let stat = event.composedPath().find(n => n.classList && n.classList.contains('stat-title'));
             if(stat && !document.body.classList.contains('locked')) {
-                this.dragging = TTBox.get('blocks').get(stat.parentNode.id);
-                this.dragging.dragging = true;
-                this.dragging.z = TTBox.get('blocks').top() + 1;
-                TTBox.get('blocks').dragging = true;
+                Events.dragging = Blocks.get(stat.parentNode.id);
+                Events.dragging.dragging = true;
+                Events.dragging.z = Blocks.top() + 1;
+                Blocks.dragging = true;
 
 
                 const rect = stat.getBoundingClientRect();
@@ -120,12 +124,13 @@ export default class Events extends TTModule {
                 const x = event.clientX - rect.left;
                 const y = event.clientY - rect.top;
 
-                TTBox.get('events').offsetX = x;
-                TTBox.get('events').offsetY = y;
+                Events.offsetX = x;
+                Events.offsetY = y;
+                
             }
         }
 
-        if(event.type == "mousemove" && this.dragging) {
+        if(event.type == "mousemove" && Events.dragging) {
             let { type, target } = event;
             if(event.x == 0 && event.y == 0)
                 return;
@@ -140,22 +145,22 @@ export default class Events extends TTModule {
 
             let gridX = Math.round(x/(GRID_SIZE + GRID_GAP));
             let gridY = Math.round(y/(GRID_SIZE + GRID_GAP));
-
-            this.dragging.move(gridX, gridY);
+            
+            Events.dragging.move(gridX, gridY);
         }
 
-        if(event.type == "mouseup" && this.dragging) {
-            this.dragging.dragging = false;
-            this.dragging = false;
-            TTBox.get('blocks').dragging = false;
-            TTBox.get('blocks').redraw();
+        if(event.type == "mouseup" && Events.dragging) {
+            Events.dragging.dragging = false;
+            Events.dragging = false;
+            Blocks.dragging = false;
+            Blocks.redraw();
         }
         
         if(event.type == "mousedown") {
             let stat = event.composedPath().find(el => el.classList && el.classList.contains('stat'));
             if(stat && !document.body.classList.contains('locked')) {
-                TTBox.get('blocks').get(stat.id).z = TTBox.get('blocks').top() + 1;
-                TTBox.get('blocks').redraw();
+                Blocks.get(stat.id).z = Blocks.top() + 1;
+                Blocks.redraw();
             }
 
             let dropdowns = document.querySelectorAll('.dropdown.open');
@@ -175,24 +180,25 @@ export default class Events extends TTModule {
         }
 
         if(event.type == "drop") {
-            TTBox.get('blocks').handle_list_reorder(event, true);
+            Events.handle_list_reorder(event, true);
         }
 
         if(event.type == "dragover") {
-            TTBox.get('blocks').handle_list_reorder(event, false);
+            Events.handle_list_reorder(event, false);
         }
 
-        if(event.target.getAttribute('data-tooltip')) {
-            if(event.type == "mouseover")
-                TTBox.get('events').showTT(event);
+        if(event.type == "mouseover" || event.type == "mouseout" || event.type == "mousemove") {
+            let tooltip = event.composedPath().find(el => el && el.dataset && el.dataset.tooltip);
+            if(event.type == "mouseover" && tooltip)
+                Events.showTT(tooltip.dataset.tooltip);
             if(event.type == "mouseout")
-                TTBox.get('events').hideTT(event);
-            if(event.type == "mousemove")
-                TTBox.get('events').moveTT(event);
+                Events.hideTT();
+            if(event.type == "mousemove" && tooltip)
+                Events.moveTT(event.screenX, event.screenY);
         }
     }
 
-    static handle_list_update(event) {
+    static handle_text_update(event) {
         let entry = event.target;
         
         let stat = event.composedPath().find(el => el.classList && el.classList.contains('stat'));
@@ -200,7 +206,20 @@ export default class Events extends TTModule {
         let list_item = event.composedPath().find(el => el.classList && el.classList.contains('list-item'));
         let list = event.composedPath().find(el => el.classList && el.classList.contains('list'));
 
-        TTBox.get('events').handle_config_update(stat.id, config.getAttribute('data-config'), entry.getAttribute('data-id'), [...list.children].indexOf(list_item));
+        //console.log(stat.id, config.dataset.config, entry.value);
+
+        Events.handle_config_update(stat.id, config.dataset.config, entry.value);
+    }
+
+    static handle_dropdown_update(event) {
+        let entry = event.target;
+        
+        let stat = event.composedPath().find(el => el.classList && el.classList.contains('stat'));
+        let config = event.composedPath().find(el => el.classList && el.classList.contains('config'));
+        let list_item = event.composedPath().find(el => el.classList && el.classList.contains('list-item'));
+        let list = event.composedPath().find(el => el.classList && el.classList.contains('list'));
+
+        Events.handle_config_update(stat.id, config.getAttribute('data-config'), entry.getAttribute('data-id'), list && [...list.children].indexOf(list_item));
     }
 
     static handle_list_add(event) {
@@ -218,7 +237,7 @@ export default class Events extends TTModule {
             cfg.push(def);
         }
 
-        TTBox.get('events').handle_config_update(stat.id, config.getAttribute('data-config'), cfg);
+        Events.handle_config_update(stat.id, config.getAttribute('data-config'), cfg);
     }
 
     static handle_list_delete(event) {
@@ -233,7 +252,7 @@ export default class Events extends TTModule {
 
         cfg.splice([...list.children].indexOf(list_item), 1);
 
-        TTBox.get('events').handle_config_update(stat.id, config.getAttribute('data-config'), cfg);
+        Events.handle_config_update(stat.id, config.getAttribute('data-config'), cfg);
     }
 
     static handle_list_reorder(event, drop=false) {
@@ -260,7 +279,7 @@ export default class Events extends TTModule {
                         let [ $current, $entries ] = [...$dropdown.children];
                         return $current.dataset.id;
                     });
-                    TTBox.get('events').handle_config_update(stat.id, config.getAttribute('data-config'), new_list);
+                    Events.handle_config_update(stat.id, config.getAttribute('data-config'), new_list);
                 }
             }
             if(drop)
@@ -270,33 +289,29 @@ export default class Events extends TTModule {
 
     static handle_config_update(id, prop, value, idx=-1) {
         let block = Blocks.get(id);
-        if(block[prop]) {
-            if(idx > -1 && block[prop][idx])
-                block[prop][idx] = value;
-            else
-                block[prop] = value;
+        if(prop == 'type') { // special case here :)
+            block = Blocks.change_type(id, value);
+        } else {
+            block.update_property(prop, value, idx);
         }
         block.update_config();
     }
 
-    static showTT(event) {
-        if(!this.tt.window.showTT)
+    static showTT(html) {
+        if(!Events.tt.window.showTT)
             return;
-        let html = event.target.getAttribute('data-tooltip');
-        this.tt.window.showTT(html);
+        Events.tt.window.showTT(html);
     }
 
-    static hideTT(event) {
-        if(!this.tt.window.hideTT)
+    static hideTT() {
+        if(!Events.tt.window.hideTT)
             return;
-        this.tt.window.hideTT();
+        Events.tt.window.hideTT();
     }
 
-    static moveTT(event) {
-        if(!this.tt.window.moveTT)
+    static moveTT(x, y) {
+        if(!Events.tt.window.moveTT)
             return;
-        let { x, y, screenX, screenY } = event;
-        let { height, width } = this.tt;
-        this.tt.window.moveTT(screenX + 8, screenY + 8);
+        Events.tt.window.moveTT(x + 8, y + 8);
     }
 }

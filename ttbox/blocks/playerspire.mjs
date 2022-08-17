@@ -3,48 +3,49 @@ import StatBlock from './block.mjs';
 import { createElement, chunks } from './../helpers.mjs';
 
 export default class PlayerSpireBlock extends StatBlock {
+    static type = 'Player Spire';
     constructor({...args}={}) {
         super({id: 'playerspire', ...args});
     }
     init() {
         super.init();
 
-        this.spire_traps_container = createElement('div', {
+        this.$spire_traps_container = createElement('div', {
             id: `player-spire-traps`,
             parent: this.$content
         });
 
-        this.spire_container = createElement('div', {
+        this.$spire_container = createElement('div', {
             id: `player-spire`,
             parent: this.$content
         });
 
-        this.spire_upgrades_container = createElement('div', {
+        this.$spire_upgrades_container = createElement('div', {
             id: `player-spire-upgrades`,
             parent: this.$content
         });
 
 
-        this.spire_traps = this.traps.map((trap) => createElement('div', {
+        this.$spire_traps = this.traps.map((trap) => createElement('div', {
                 id: `player-spire-trap-${trap.name.toLowerCase()}`,
                 classList: ['player-spire-trap'],
-                parent: this.spire_traps_container
+                parent: this.$spire_traps_container
             })
         );
 
 
-        this.spire_upgrades = this.traps.map((trap) => createElement('div', {
+        this.$spire_upgrades = this.traps.map((trap) => createElement('div', {
                 id: `player-spire-upgrade-${trap.name.toLowerCase()}`,
                 classList: ['player-spire-upgrade'],
-                parent: this.spire_upgrades_container
+                parent: this.$spire_upgrades_container
             })
         );
 
         
-        this.spire = this.grid.map((cell) => createElement('div', {
+        this.$spire = this.grid.map((cell) => createElement('div', {
                 id: `player-spire-cell-${cell.id}`,
                 classList: ['player-spire-cell'],
-                parent: this.spire_container
+                parent: this.$spire_container
             })
         );
         
@@ -54,8 +55,8 @@ export default class PlayerSpireBlock extends StatBlock {
         super.update();
 
         this.traps.forEach((trap, i) => {
-            let $trap = this.spire_traps[i];
-            let $upgrade = this.spire_upgrades[i];
+            let $trap = this.$spire_traps[i];
+            let $upgrade = this.$spire_upgrades[i];
             
             if (trap.locked) return;
 
@@ -81,7 +82,7 @@ export default class PlayerSpireBlock extends StatBlock {
         
         
         this.grid.forEach((cell, i) => {
-            let item = this.spire[i];
+            let item = this.$spire[i];
             item.style['background-image'] = '';
             let [name, value] = gameWindow.playerSpire.getSetTrapBgColor(cell.id).split(':');
             item.style[name] = value;

@@ -125,7 +125,7 @@ export default class TTBox {
 
                 if(mod.running) {
                     try {
-                        return mod.update(...arguments);
+                        return mod.update(this.tick, ...arguments);
                     } catch(e) {
                         console.log(`Error in ${mod.id}.update`, e);
                         return Promise.reject();
