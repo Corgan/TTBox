@@ -16,6 +16,7 @@ export default class Events extends TTModule {
     static dragging = false;
     static resizing = false;
     static direction = false;
+    static focused = false;
 
     static async start() {
         await super.start(...arguments);
@@ -31,7 +32,70 @@ export default class Events extends TTModule {
         document.body.addEventListener('mousemove', Events.handle_mouse_event, true);
         document.body.addEventListener('mousedown', Events.handle_mouse_event, true);
 
+        nw.Window.get().on('focus', () => Events.focused = true);
+        nw.Window.get().on('blur', () => Events.focused = false);
+
+        this.hook(gameWindow, 'startFight', 'fight');
+        this.hook(gameWindow, 'nextWorld', 'world');
+        this.hook(gameWindow, 'battle', 'battle');
+
         Events.tt.window.location.reload();
+    }
+
+    static async stop() {
+        await super.stop(...arguments);
+
+        Object.values(this.hooks).forEach(hook => {
+            hook.obj[hook.method] = hook.original;
+            delete hook.obj;
+            delete hook.method;
+            delete hook.original;
+        });
+    }
+
+    static onHandlers = {};
+
+    static on(event, type, cb) {
+        if(!this.onHandlers[event])
+            this.onHandlers[event] = {};
+        if(!this.onHandlers[event][type])
+            this.onHandlers[event][type] = [];
+        this.onHandlers[event][type].push(cb);
+    }
+
+    static trigger(event, type, args=[], ret) {
+        if(this.onHandlers[event] && this.onHandlers[event][type])
+            this.onHandlers[event][type].forEach(handler => handler(...args, ret));
+    }
+
+    static hooks = {};
+    static hook(obj, method, event) {
+        if(typeof obj[method] == 'function') {
+            if(typeof this.hooks[event] == 'undefined') {
+                this.hooks[event] = {};
+                this.hooks[event].original = obj[method];
+                this.hooks[event].obj = obj;
+                this.hooks[event].method = method;
+
+                obj[method] = (...args) => {
+                    try {
+                        this.trigger(event, 'pre', [...args]);
+                    } catch(e) {
+                        console.log(`error in pre hooked function ${method}`, e);
+                    }
+
+                    let ret = this.hooks[event].original.call(obj, ...args);
+
+                    try {
+                        this.trigger(event, 'post', [...args], ret);
+                    } catch(e) {
+                        console.log(`error in post hooked function ${method}`, e);
+                    }
+
+                    return ret;
+                }
+            }
+        }
     }
 
     static handle_mouse_event(event) {
@@ -191,10 +255,10 @@ export default class Events extends TTModule {
             let tooltip = event.composedPath().find(el => el && el.dataset && el.dataset.tooltip);
             if(event.type == "mouseover" && tooltip)
                 Events.showTT(tooltip.dataset.tooltip);
-            if(event.type == "mouseout")
-                Events.hideTT();
             if(event.type == "mousemove" && tooltip)
                 Events.moveTT(event.screenX, event.screenY);
+            if((event.type == "mouseover" || event.type == "mouseout") && !tooltip)
+                Events.hideTT();
         }
     }
 
@@ -297,16 +361,23 @@ export default class Events extends TTModule {
         block.update_config();
     }
 
+    static hideDebounce = false;
+
     static showTT(html) {
         if(!Events.tt.window.showTT)
             return;
+        if(this.hideDebounce)
+            clearTimeout(this.hideDebounce);
         Events.tt.window.showTT(html);
     }
 
     static hideTT() {
         if(!Events.tt.window.hideTT)
             return;
-        Events.tt.window.hideTT();
+        if(this.hideDebounce)
+            clearTimeout(this.hideDebounce);
+
+        this.hideDebounce = setTimeout(() => Events.tt.window.hideTT(), 25);
     }
 
     static moveTT(x, y) {

@@ -125,7 +125,7 @@ export default class InfoBlock extends StatBlock {
         { id: "gator-next", name: "Next Gator", fn: () => gameWindow.prettify(game.jobs.Amalgamator.getTriggerThresh() * game.resources.trimps.getCurrentSend()) },
         { id: "gators", name: "Gators", fn: () => gameWindow.prettify(game.jobs.Amalgamator.owned) },
         { id: "gator-ratio", name: "Pop Ratio", fn: () => gameWindow.prettify(game.resources.trimps.realMax() / game.resources.trimps.getCurrentSend()) },
-        { id: "scry-cells", name: "Scry Cells", fn: () => [...new Array(100).keys()].map(x => gameWindow.getRandomIntSeeded(game.global.scrySeed + (x + 1) - (game.global.lastClearedCell + 1), 0, 100)).map((x, i) => x <= 52 && x >= 50 ? i : 0).filter(Boolean).join(', ') },
+        { id: "scry-cells", name: "Scry Cells", fn: () => [...new Array(100).keys()].map(x => gameWindow.getRandomIntSeeded(game.global.scrySeed + (x + 1) - (game.global.lastClearedCell + 2), 0, 100)).map((x, i) => x <= 52 && x >= 50 ? i : 0).filter(Boolean).join(', ') },
         { id: "fluff-dmg", name: "Fluff %", fn: () => gameWindow.prettify((gameWindow.Fluffy.getDamageModifier() - 1) * 100) },
         { id: "golden-helium", name: "Golden Helium", fn: () => `${game.goldenUpgrades.Helium.purchasedAt.length} (${Math.round(game.goldenUpgrades.Helium.currentBonus * 100)}%)` },
         { id: "golden-battle", name: "Golden Battle", fn: () => `${game.goldenUpgrades.Battle.purchasedAt.length} (${Math.round(game.goldenUpgrades.Battle.currentBonus * 100)}%)` },

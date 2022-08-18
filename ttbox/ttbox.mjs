@@ -24,6 +24,7 @@ export default class TTBox {
                 return this.loadModule(current);
             }, Promise.resolve());
             await this.start();
+            window.addEventListener('beforeunload', this.stop.bind(this));
         })();
     };
 

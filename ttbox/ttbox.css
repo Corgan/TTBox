@@ -469,8 +469,11 @@ input[type="text"] {
 }
 
 #content > .world .stat-content #world-grid .world-cell {
-    display: inline-block;
+    display: inline-flex;
     position: relative;
+    color: white;
+    align-items: center;
+    justify-content: center;
 }
 
 #content > .map .stat-content {
@@ -513,16 +516,114 @@ input[type="text"] {
     height: 100%;
 }
 
-.universe-cell {
+.cell {
     display: inline-flex;
     position: relative;
-    justify-content: flex-start;
     background: #464646;
     color: black;
+    padding: 2px;
+    gap: 2px;
+    min-height: 16px;
 }
-.universe-cell .universe-cell-mutation {
+
+.cell.not-beaten {
+    color: white;
+}
+
+.cell.beaten {
+    color: white;
+    background: #164e11;
+}
+
+.cell.poison {
+    color: black;
+    background: rgb(36, 110, 36);
+}
+
+.cell.wind {
+    color: black;
+    background: rgb(50, 62, 107);
+}
+
+.cell.ice {
+    color: black;
+    background: rgb(27, 27, 161);
+}
+
+.cell.poison.beaten {
+    color: black;
+    background: rgb(85, 202, 85);
+}
+
+.cell.wind.beaten {
+    color: black;
+    background: rgb(92, 107, 161);
+}
+
+.cell.ice.beaten {
+    color: black;
+    background: rgb(81, 81, 233);
+}
+
+.cell.spire {
+    background: #7a7791;
+}
+
+.cell.spire.beaten {
+    background: #9893b4;
+}
+
+.cell.highest {
+    background: #be7c00;
+}
+
+.cell.obsidian {
+    color: white;
+    background: black;
+}
+
+.cell.liquid {
+    background: #c0c000;
+    color: black;
+    border: none;
+}
+
+.cell.current {
+    color: black;
+    background: #ffff00;
+}
+
+.cell.corruption {
+    color: white;
+    background: #23063f;
+}
+
+.cell.beaten.corruption {
+    background: #6e10cc;
+}
+
+.cell.healthy {
+    color: white;
+    background: #553b17;
+}
+
+.cell.beaten.healthy {
+    background: #795625;
+}
+
+.cell.magma {
+    color: white;
+    background: #7c0000;
+}
+
+.cell.beaten.magma {
+    background: #be1d11;
+}
+
+.cell .mutation {
     display: inline-flex;
     position: relative;
+    justify-self: flex-start;
     justify-content: flex-end;
 
     top: 0;
@@ -530,122 +631,90 @@ input[type="text"] {
     width: 50%;
     box-sizing: border-box;
     border: 1px solid black;
-    margin: 2px;
     background: black;
 }
 
-.universe-cell .universe-cell-corruption {
+.cell .mutation .corruption {
     top: 0;
     bottom: 0;
     background: #23063f;
     box-sizing: border-box;
 }
 
-.universe-cell.beaten .universe-cell-corruption {
+.cell.beaten .mutation .corruption {
     background: #6e10cc;
 }
 
-.universe-cell .universe-cell-healthy {
+.cell .mutation .healthy {
     top: 0;
     bottom: 0;
     background: #553b17;
     box-sizing: border-box;
 }
 
-.universe-cell.beaten .universe-cell-healthy {
+.cell.beaten .mutation .healthy {
     background: #795625;
 }
 
-.universe-cell .universe-cell-magma {
+.cell .mutation .magma {
     top: 0;
     bottom: 0;
     background: #7c0000;
     box-sizing: border-box;
-    margin-left: auto;l
+    margin-left: auto;
 }
 
-.universe-cell.beaten .universe-cell-magma {
+.cell.beaten .mutation .magma {
     background: #be1d11;
 }
 
-.universe-cell.poison {
-    background: rgb(36, 110, 36);
+.cell .timer {
+    display: inline-flex;
+    position: relative;
+    justify-self: center;
+    align-items: center;
+    margin: auto;
+    font-size: 8px;
+    font-weight: bold;
 }
 
-.universe-cell.wind {
-    background: rgb(50, 62, 107);
+.cell.not-beaten:not(.current) .timer {
+    opacity: 0;
 }
 
-.universe-cell.ice {
-    background: rgb(27, 27, 161);
+.cell .timer span {
+    font-size: 10px;
 }
 
-.universe-cell.poison.beaten {
-    background: rgb(85, 202, 85);
-}
-
-.universe-cell.wind.beaten {
-    background: rgb(92, 107, 161);
-}
-
-.universe-cell.ice.beaten {
-    background: rgb(81, 81, 233);
-}
-
-.universe-cell.beaten {
-    /*background: #164e11;*/
-}
-
-.universe-cell.spire {
-    background: #7a7791;
-}
-
-.universe-cell.spire.beaten {
-    background: #9893b4;
-}
-
-.universe-cell.highest {
-    background: #be7c00;
-}
-
-.universe-cell.obsidian {
-    background: black;
-}
-
-.universe-cell.liquid {
-    background: #c0c000;
-    border: none;
-}
-
-.universe-cell.current {
-    color: black;
-    background: #ffff00;
-}
-
-.universe-cell .universe-cell-icons {
+.cell .glyphs {
     display: inline-flex;
     position: relative;
     align-items: center;
+    justify-self: flex-end;
     justify-content: flex-end;
     gap: 2px;
 
     top: 0;
     bottom: 0;
-    width: 50%;
+    width: max-content;
     box-sizing: border-box;
-    margin: 2px;
+    padding: auto;
 }
 
-.universe-cell .universe-cell-icons .cell-icon {
+.cell .glyphs,
+.cell .glyphs .glyph {
     display: none;
 }
 
-
-.universe-cell.poison .cell-icon-poison,
-.universe-cell.wind .cell-icon-wind,
-.universe-cell.ice .cell-icon-ice,
-.universe-cell.spire .cell-icon-spire {
-    display: block;
+.cell.poison .glyphs,
+.cell.poison .glyph.poison,
+.cell.wind .glyphs,
+.cell.wind .glyph.wind,
+.cell.ice .glyphs,
+.cell.ice .glyph.ice,
+.cell.spire .glyphs,
+.cell.spire .glyph.spire {
+    display: inline-flex;
 }
 
 #content > .playerspire .stat-content {

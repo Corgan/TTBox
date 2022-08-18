@@ -1,14 +1,31 @@
 import TTBox from '../ttbox.mjs';
 import StatBlock from './block.mjs';
 import { createElement, chunks } from './../helpers.mjs';
+import Events from '../modules/events.mjs';
 
 export default class UniverseBlock extends StatBlock {
     static type = 'Universe Grid';
     constructor({...args}={}) {
         super({id: 'universe', ...args});
     }
+    static hooked = false;
+    worldTimes = [];
+    startTime = game.global.portalTime;
     init() {
         super.init();
+
+        if(!this.hooked) {
+            Events.on('portal', 'post', () => {
+                this.worldTimes = [];
+                this.startTime = game.global.portalTime;
+                this.$universe.forEach($cell => $cell.dataset.id = -1);
+            })
+            Events.on('world', 'pre', () => {
+                if(!this.worldTimes[game.global.world])
+                    this.worldTimes[game.global.world] = Date.now();
+            })
+            this.hooked = true;
+        }
 
         if(!this.$container)
             this.$container = createElement('div', {
@@ -20,36 +37,39 @@ export default class UniverseBlock extends StatBlock {
         if(!this.$universe)
             this.$universe = this.grid.map((cell, i) => createElement('div', {
                     id: `universe-cell-${i}`,
-                    classList: ['universe-cell'],
+                    classList: ['cell'],
                     children: [
                         createElement('div', {
-                            classList: ['universe-cell-mutation'],
+                            classList: ['mutation'],
                             children: [
                                 createElement('div', {
-                                    classList: ['universe-cell-corruption']
+                                    classList: ['healthy']
                                 }),
                                 createElement('div', {
-                                    classList: ['universe-cell-healthy']
+                                    classList: ['corruption']
                                 }),
                                 createElement('div', {
-                                    classList: ['universe-cell-magma']
+                                    classList: ['magma']
                                 })
                             ]
                         }),
                         createElement('div', {
-                            classList: ['universe-cell-icons'],
+                            classList: ['timer']
+                        }),
+                        createElement('div', {
+                            classList: ['glyphs'],
                             children: [
                                 createElement('div', {
-                                    classList: ['cell-icon', 'cell-icon-ice', 'icon-certificate']
+                                    classList: ['glyph', 'ice', 'icon-certificate']
                                 }),
                                 createElement('div', {
-                                    classList: ['cell-icon', 'cell-icon-wind', 'icon-air']
+                                    classList: ['glyph', 'wind', 'icon-air']
                                 }),
                                 createElement('div', {
-                                    classList: ['cell-icon', 'cell-icon-poison', 'icon-flask']
+                                    classList: ['glyph', 'poison', 'icon-flask']
                                 }),
                                 createElement('div', {
-                                    classList: ['cell-icon', 'cell-icon-spire', 'icon-connection']
+                                    classList: ['glyph', 'spire', 'icon-connection']
                                 })
                             ]
                         })
@@ -67,94 +87,112 @@ export default class UniverseBlock extends StatBlock {
         
         this.grid.forEach((cell, i) => {
             let $cell = this.$universe[i];
-
-            let [ $mutation ] = [...$cell.children];
-            let [ $corruption, $healthy, $magma ] = [...$mutation.children];
-
             let id = game.global.world;
-			var classes = ["universe-cell"];
-            classes.push(cell.id >= id ? "not-beaten" : "beaten");
 
-            let showMagma = false;
-            let corruptCellCount = showMagma ? 100 : 80;
+            if($cell.dataset.id != cell.id || $cell.classList.contains('current') || (cell.id <= id && $cell.classList.contains('not-beaten')) || (cell.id >= id && $cell.classList.contains('beaten'))) {
+                let [ $mutation, $timer, $icons ] = [...$cell.children];
+                let [ $healthy, $corruption, $magma ] = [...$mutation.children];
 
-            let magmaCount = showMagma ? 20 : 0;
-            let healthyCount = this.constructor.getHealthyCount(cell.id, Math.ceil(Math.max(0, cell.id-200) / 100));
-            let corruptionCount = this.constructor.getCorruptionCount(cell.id) - healthyCount;
+                var classes = ["cell"];
+                classes.push(cell.id >= id ? "not-beaten" : "beaten");
 
-            let magmaPct = (magmaCount / corruptCellCount) * 100;
-            let healthyPct = (healthyCount / corruptCellCount) * 100;
-            let corruptionPct = (corruptionCount / corruptCellCount) * 100;
-            let natureType = this.constructor.getNatureType(cell.id);
-            let liqZone = this.constructor.getLiq();
+                let showMagma = false;
+                let corruptCellCount = showMagma ? 100 : 80;
 
-            if(natureType)
-                classes.push(natureType);
-            if(cell.id == id)
-                classes.push("current");
-            if(cell.id == game.global.highestLevelCleared)
-                classes.push("highest");
-            if(cell.id > 100 && cell.id % 100 == 0)
-                classes.push('spire');
-            if(cell.id <= liqZone && !(cell.id > 100 && cell.id % 100 == 0))
-                classes.push('liquid');
-            if(cell.id >= gameWindow.getObsidianStart()) {
-                classes.push('obsidian');
-            } else {
-                if(corruptionCount > 0 || healthyCount > 0 || magmaCount > 0) {
-                    $mutation.style.opacity = 1;
+                let magmaCount = showMagma ? 20 : 0;
+                let healthyCount = this.constructor.getHealthyCount(cell.id, Math.ceil(Math.max(0, cell.id-200) / 100));
+                let corruptionCount = cell.id >= gameWindow.mutations.Corruption.start() ? this.constructor.getCorruptionCount(cell.id) - healthyCount : 0;
+
+                let magmaPct = (magmaCount / corruptCellCount) * 100;
+                let healthyPct = (healthyCount / corruptCellCount) * 100;
+                let corruptionPct = (corruptionCount / corruptCellCount) * 100;
+                let natureType = this.constructor.getNatureType(cell.id);
+                let liqZone = this.constructor.getLiq();
+
+                if(natureType)
+                    classes.push(natureType);
+                if(cell.id == id)
+                    classes.push("current");
+                if(cell.id == game.global.highestLevelCleared)
+                    classes.push("highest");
+                if(cell.id > 100 && cell.id % 100 == 0)
+                    classes.push('spire');
+                if(cell.id <= liqZone && !(cell.id > 100 && cell.id % 100 == 0))
+                    classes.push('liquid');
+                if(cell.id >= gameWindow.getObsidianStart()) {
+                    classes.push('obsidian');
                 } else {
-                    $mutation.style.opacity = 0;
-                }
-                if(corruptionCount > 0) {
-                    $corruption.style.width = `${corruptionPct}%`;
-                } else {
-                    $corruption.style.width = 0;
-                    $corruption.style.border = `none`;
-                }
+                    if(corruptionCount > 0 || healthyCount > 0 || magmaCount > 0) {
+                        $mutation.style.opacity = 1;
+                    } else {
+                        $mutation.style.opacity = 0;
+                    }
 
-                if(healthyCount > 0) {
-                    $healthy.style.width = `${healthyPct}%`;
-                    $healthy.style.borderLeft = `1px solid black`;
-                } else {
-                    $healthy.style.width = 0;
-                    $healthy.style.border = `none`;
+                    if(healthyCount > 0) {
+                        $healthy.style.width = `${healthyPct}%`;
+                    } else {
+                        $healthy.style.width = 0;
+                        $healthy.style.border = `none`;
+                    }
+
+                    if(corruptionCount > 0) {
+                        $corruption.style.width = `${corruptionPct}%`;
+                        $corruption.style.borderLeft = `1px solid black`;
+                    } else {
+                        $corruption.style.width = 0;
+                        $corruption.style.border = `none`;
+                    }
+                    
+                    if(magmaCount > 0) {
+                        $magma.style.width = `${magmaPct}%`;
+                        $magma.style.borderLeft = `1px solid black`;
+                    } else {
+                        $magma.style.width = 0;
+                        $magma.style.border = `none`;
+                    }
                 }
                 
-                if(magmaCount > 0) {
-                    $magma.style.width = `${magmaPct}%`;
-                    $magma.style.borderLeft = `1px solid black`;
-                } else {
-                    $magma.style.width = 0;
-                    $magma.style.border = `none`;
+                // else {
+                //    if(cell.mutation)
+                //        classes.push(cell.mutation);
+                //    
+                //    if(cell.vm)
+                //        classes.push(cell.vm);
+                //    
+                //    if(cell.empowerment)
+                //        classes.push("empoweredCell" + cell.empowerment);
+                //    
+                //    if(game.global.spireActive)
+                //        classes.push("spireCell");
+                //}
+                $cell.dataset.id = cell.id;
+                $cell.className = classes.join(" ");
+
+                // Fix for loading in the middle of a zone?
+                if(id == cell.id && !this.worldTimes[cell.id-1])
+                    this.worldTimes[cell.id-1] = game.global.zoneStarted;
+
+                let worldTime = this.worldTimes[cell.id];
+                let prevWorldTime = cell.id > 0 ? this.worldTimes[cell.id-1] : this.startTime;
+                let timeDiff = worldTime && prevWorldTime ? (worldTime - prevWorldTime) / 1000 : false;
+                if(timeDiff == false && prevWorldTime && id == cell.id)
+                    timeDiff = (Date.now() - prevWorldTime) / 1000;
+
+                if(timeDiff !== false)
+                    $timer.innerText = timeDiff >= 1000 ? Math.floor(timeDiff / 60) + 'm' : timeDiff >= 100 ? Math.ceil(timeDiff) : timeDiff >= 10 ? timeDiff.toFixed(1) : timeDiff >= 0.01 ? timeDiff.toFixed(2) : 0;
+                else $timer.innerHTML = '';
+
+                let tt = {
+                    ...cell,
+                    worldTime: worldTime,
+                    clearTime: timeDiff,
+                    natureType: natureType,
+                    magmaCount: magmaCount,
+                    healthyCount: healthyCount,
+                    corruptionCount: corruptionCount
                 }
+                $cell.dataset.tooltip = `<pre>${JSON.stringify(tt, null, 2)}</pre>`;
             }
-            
-            // else {
-            //    if(cell.mutation)
-            //        classes.push(cell.mutation);
-            //    
-            //    if(cell.vm)
-            //        classes.push(cell.vm);
-            //    
-            //    if(cell.empowerment)
-            //        classes.push("empoweredCell" + cell.empowerment);
-            //    
-            //    if(game.global.spireActive)
-            //        classes.push("spireCell");
-            //}
-            $cell.dataset.id = cell.id;
-            $cell.className = classes.join(" ");
-
-
-            let tt = {
-                ...cell,
-                natureType: natureType,
-                magmaCount: magmaCount,
-                healthyCount: healthyCount,
-                corruptionCount: corruptionCount
-            }
-            $cell.dataset.tooltip = `<pre>${JSON.stringify(tt, null, 2)}</pre>`;
         });
     }
 
