@@ -54,7 +54,9 @@ export default class ChartBlock extends StatBlock {
             }, {
                 showPoint: true,
                 axisY: {
-                    type: Chartist.AutoScaleAxis
+                    type: Chartist.AutoScaleAxis,
+                    onlyInteger: true,
+                    referenceValue: 15
                 },
                 axisX: {
                     type: Chartist.FixedScaleAxis,
@@ -73,7 +75,9 @@ export default class ChartBlock extends StatBlock {
             }, {
                 showPoint: true,
                 axisY: {
-                    type: Chartist.AutoScaleAxis
+                    type: Chartist.AutoScaleAxis,
+                    onlyInteger: true,
+                    referenceValue: 15
                 },
                 axisX: {
                     type: Chartist.FixedScaleAxis,
