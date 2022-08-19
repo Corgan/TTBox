@@ -108,6 +108,9 @@ export default class Events extends TTModule {
                 Blocks.resizing = false;
                 Blocks.dragging = false;
             }
+            if(event.toElement == null) {
+                Events.hideTT();
+            }
         }
 
         if(event.target.classList.contains('resizer')) {
