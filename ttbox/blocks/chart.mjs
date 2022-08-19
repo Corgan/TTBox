@@ -130,8 +130,7 @@ export default class ChartBlock extends StatBlock {
                 ticks: [...this.cellTimes.map((_,i) => cell - (this.cellTimes.length-1) + i)]
             }
         }
-
-        console.log(worldData, worldOptions, cellData, cellOptions);
+        
         this.worlds.update({ series: [worldData] }, worldOptions, true);
         this.cells.update({ series: [cellData] }, cellOptions, true);
     }
