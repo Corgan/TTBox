@@ -81,13 +81,17 @@
             const mObserver = new MutationObserver(fitContent);
             mObserver.observe(document.body, {attributes: true, childList: true, subtree: true});
 
+            document.body.addEventListener('mousemove', function(event) {
+                moveTT(event.screenX + 8, event.screenY + 8);
+            })
+
             window.showTT = function(html) {
                 document.getElementById('content').innerHTML = html;
             }
 
             window.hideTT = function() {
                 document.getElementById('content').innerHTML = '';
-                
+
                 let win = nw.Window.get();
                 win.moveTo(9999, 9999);
             }

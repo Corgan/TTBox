@@ -154,6 +154,7 @@ export default class Blocks extends TTModule {
         this.$pin.addEventListener('click', () => {
             let win = nw.Window.get();
             this.ontop = !this.ontop;
+            this.save();
             win.setAlwaysOnTop(this.ontop);
             this.$pin.classList.toggle('on', this.ontop);
         });
@@ -164,6 +165,7 @@ export default class Blocks extends TTModule {
         this.$lock.addEventListener('click', () => {
             let win = nw.Window.get();
             this.locked = !this.locked;
+            this.save();
             //win.setResizable(!this.locked); Setting resizable to true after being set to false doesn't seem to work?
             gameWindow.swapClass('icon-', this.locked ? "icon-lock" : "icon-lock-open", this.$lock);
             this.redraw();
