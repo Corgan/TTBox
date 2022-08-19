@@ -5,6 +5,7 @@
         <link rel="stylesheet" type="text/css" href="/css/style.css">
         <link rel="stylesheet" type="text/css" href="/mods/ttbox/ttbox.css">
         <link rel="stylesheet" type="text/css" href="/mods/mods.css">
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/chartist@1.1.2/dist/index.css">
     </head>
     <body>
         <div id="wrapper">
@@ -46,9 +47,15 @@
         </script>
         <script type="module">
             import TTBox from './ttbox.mjs';
+            import * as Chartist from 'https://cdn.jsdelivr.net/npm/chartist@1.1.2/dist/index.js';
 
             let gameWindow = (await (new Promise(resolve => nw.Window.getAll(a => resolve(a))))).find(w => w.window.location.href.match("/index.html")).window;
 
+            Object.defineProperty(window, 'Chartist', {
+                enumerable: false,
+                get: () => Chartist
+            });
+            
             Object.defineProperty(window, 'game', {
                 enumerable: false,
                 get: () => gameWindow.game

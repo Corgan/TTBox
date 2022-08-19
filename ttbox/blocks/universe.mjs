@@ -15,15 +15,16 @@ export default class UniverseBlock extends StatBlock {
         super.init();
 
         if(!this.hooked) {
-            Events.on('portal', 'post', () => {
+            this.hooks.push(Events.on('portal', 'post', () => {
                 this.worldTimes = [];
                 this.startTime = game.global.portalTime;
                 this.$universe.forEach($cell => $cell.dataset.id = -1);
-            })
-            Events.on('world', 'pre', () => {
+            }))
+            
+            this.hooks.push(Events.on('world', 'pre', () => {
                 if(!this.worldTimes[game.global.world])
                     this.worldTimes[game.global.world] = Date.now();
-            })
+            }))
             this.hooked = true;
         }
 

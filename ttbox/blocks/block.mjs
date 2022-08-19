@@ -19,6 +19,8 @@ export default class StatBlock {
         this.x = x;
         this.y = y;
         this.z = z || 0;
+        this.hooked = false;
+        this.hooks = [];
     }
     init() {
         if(!this.$el)
@@ -108,6 +110,10 @@ export default class StatBlock {
     delete() {
         this.$el.innerHTML = '';
         document.getElementById('content').removeChild(this.$el);
+        this.hooked = false;
+        this.hooks.forEach(hook => {
+            hook.remove();
+        });
         Object.keys(this).forEach(key => delete this[key]);
         this.load();
         this.dragging = false;

@@ -15,8 +15,9 @@ export default class MapBlock extends StatBlock {
         super.init();
 
         if(!this.hooked) {
-            Events.on('world', 'pre', () => {})
-            Events.on('battle', 'pre', () => {
+            this.hooks.push(Events.on('world', 'pre', () => {}))
+            
+            this.hooks.push(Events.on('battle', 'pre', () => {
                 if(game.global.lastClearedMapCell == -1 && game.global.mapGridArray.length > 0 && game.global.mapsActive) {
                     this.cellTimes = [];
                     this.startTime = game.global.mapStarted;
@@ -24,7 +25,7 @@ export default class MapBlock extends StatBlock {
                 }
                 else if(!this.cellTimes[game.global.lastClearedMapCell] && game.global.mapGridArray.length > 0 && game.global.mapsActive)
                     this.cellTimes[game.global.lastClearedMapCell] = Date.now();
-            })
+            }))
             this.hooked = true;
         }
 

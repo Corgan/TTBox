@@ -15,17 +15,18 @@ export default class WorldBlock extends StatBlock {
         super.init();
 
         if(!this.hooked) {
-            Events.on('world', 'pre', () => {
+            this.hooks.push(Events.on('world', 'pre', () => {
                 if(!game.global.mapsActive) {
                     this.cellTimes = [];
                     this.startTime = Date.now();
                 }
                 this.$world.forEach($cell => $cell.dataset.id = -1);
-            })
-            Events.on('battle', 'pre', () => {
+            }))
+            
+            this.hooks.push(Events.on('battle', 'pre', () => {
                 if(!this.cellTimes[game.global.lastClearedCell] && !game.global.mapsActive)
                     this.cellTimes[game.global.lastClearedCell] = Date.now();
-            })
+            }))
             this.hooked = true;
         }
 
@@ -67,7 +68,7 @@ export default class WorldBlock extends StatBlock {
     }
     update() {
         super.update();
-        this.$container.classList.toggle("liquid", game.global.gridArray[0].name == "Liquimp");
+        this.$container.classList.toggle("liquid", game.global.gridArray && game.global.gridArray.length > 0 && game.global.gridArray[0].name == "Liquimp");
         this.$container.classList.toggle("spire", game.global.spireActive);
         
         this.grid.forEach((cell, i) => {

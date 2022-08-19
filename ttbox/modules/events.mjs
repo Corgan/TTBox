@@ -57,12 +57,18 @@ export default class Events extends TTModule {
             this.onHandlers[event] = {};
         if(!this.onHandlers[event][type])
             this.onHandlers[event][type] = [];
-        this.onHandlers[event][type].push(cb);
+
+        let hook = {
+            cb: cb,
+            remove: () => this.onHandlers[event][type].splice(this.onHandlers[event][type].indexOf(hook), 1)
+        }
+        this.onHandlers[event][type].push(hook);
+        return hook;
     }
 
     static trigger(event, type, args=[], ret) {
         if(this.onHandlers[event] && this.onHandlers[event][type])
-            this.onHandlers[event][type].forEach(handler => handler(...args, ret));
+            this.onHandlers[event][type].forEach(handler => handler.cb(...args, ret));
     }
 
     static hooks = {};

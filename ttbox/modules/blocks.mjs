@@ -12,7 +12,7 @@ export default class Blocks extends TTModule {
     static running = false;
 
     static loadable = [
-        'bw', 'c2s', 'daily', 'heirlooms', 'info', 'maps', 'playerspire', 'text', 'voids', 'world', 'map', 'universe'
+        'bw', 'c2s', 'chart', 'daily', 'heirlooms', 'info', 'maps', 'playerspire', 'text', 'voids', 'world', 'map', 'universe'
     ];
     static lookup = {};
     static reverseLookup = {};
