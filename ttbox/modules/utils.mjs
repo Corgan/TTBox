@@ -17,6 +17,10 @@ export default class UtilsModule extends TTModule {
         await super.update(...arguments);
     }
 
+    static get hze() {
+        return game.global.universe == 2 ? game.global.highestRadonLevelCleared : game.global.highestLevelCleared;
+    }
+
     static badCoordLevel(world) {
         let amt = 1;
         for (var x = 0; x < world - 1; x++) {

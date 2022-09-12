@@ -42,7 +42,7 @@ export default class Events extends TTModule {
     static async stop() {
         await super.stop(...arguments);
 
-        Object.values(this.hooks).forEach(hook => {
+        Object.values(this.hookHandlers).forEach(hook => {
             hook.obj[hook.method] = hook.original;
             delete hook.obj;
             delete hook.method;
@@ -71,14 +71,14 @@ export default class Events extends TTModule {
             this.onHandlers[event][type].forEach(handler => handler.cb(...args, ret));
     }
 
-    static hooks = {};
+    static hookHandlers = {};
     static hook(obj, method, event) {
         if(typeof obj[method] == 'function') {
-            if(typeof this.hooks[event] == 'undefined') {
-                this.hooks[event] = {};
-                this.hooks[event].original = obj[method];
-                this.hooks[event].obj = obj;
-                this.hooks[event].method = method;
+            if(typeof this.hookHandlers[event] == 'undefined') {
+                this.hookHandlers[event] = {};
+                this.hookHandlers[event].original = obj[method];
+                this.hookHandlers[event].obj = obj;
+                this.hookHandlers[event].method = method;
 
                 obj[method] = (...args) => {
                     try {
@@ -87,7 +87,7 @@ export default class Events extends TTModule {
                         console.log(`error in pre hooked function ${method}`, e);
                     }
 
-                    let ret = this.hooks[event].original.call(obj, ...args);
+                    let ret = this.hookHandlers[event].original.call(obj, ...args);
 
                     try {
                         this.trigger(event, 'post', [...args], ret);

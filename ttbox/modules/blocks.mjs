@@ -193,7 +193,7 @@ export default class Blocks extends TTModule {
         await super.update(...arguments);
         this.blocks.forEach(block => {
             try {
-                block.update();
+                block.update(...arguments);
             } catch(e) {
                 console.log(e);
             }

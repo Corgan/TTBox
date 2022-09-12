@@ -1,5 +1,6 @@
 import TTModule from './module.mjs';
 import TTBox from './../ttbox.mjs';
+import Events from './events.mjs';
 
 export default class MapsModule extends TTModule {
     constructor() { super(); }

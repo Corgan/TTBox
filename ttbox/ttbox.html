@@ -5,7 +5,7 @@
         <link rel="stylesheet" type="text/css" href="/css/style.css">
         <link rel="stylesheet" type="text/css" href="/mods/ttbox/ttbox.css">
         <link rel="stylesheet" type="text/css" href="/mods/mods.css">
-        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/chartist@1.1.2/dist/index.css">
+        <link rel="stylesheet" type="text/css" href="https://leeoniya.github.io/uPlot/dist/uPlot.min.css">
     </head>
     <body>
         <div id="wrapper">
@@ -47,15 +47,64 @@
         </script>
         <script type="module">
             import TTBox from './ttbox.mjs';
-            import * as Chartist from 'https://cdn.jsdelivr.net/npm/chartist@1.1.2/dist/index.js';
 
+            /*
+                function tooltip(chart) {
+                    let tooltipSelector = 'ct-point';
+                    if (chart.constructor.name == Chartist.BarChart.prototype.constructor.name) {
+                        tooltipSelector = 'ct-chart-line';
+                    } else if (chart.constructor.name == Chartist.BarChart.prototype.constructor.name) {
+                        tooltipSelector = 'ct-chart-bar';
+                    } else if (chart.constructor.name ==  Chartist.PieChart.prototype.constructor.name) {
+                        // Added support for donut graph
+                        if (chart.options.donut) {
+                            tooltipSelector = 'ct-chart-slice-donut';
+                        } else {
+                            tooltipSelector = 'ct-chart-slice-pie';
+                        }
+                    }
+
+                    var $chart = chart.container;
+
+                    on('mouseover', tooltipSelector, function (event) {
+                        var $point = event.target;
+                        var tooltipText = '';
+
+                        var isPieChart = (chart instanceof Chartist.PieChart) ? $point : $point.parentNode;
+                        var seriesName = (isPieChart) ? $point.parentNode.getAttribute('ct:meta') || $point.parentNode.getAttribute('ct:series-name') : '';
+                        var meta = $point.getAttribute('ct:meta') || seriesName || '';
+                        var hasMeta = !!meta;
+                        var value = $point.getAttribute('ct:value');
+
+                        if (options.transformTooltipTextFnc && typeof options.transformTooltipTextFnc === 'function') {
+                            value = options.transformTooltipTextFnc(value);
+                        }
+
+                        if (options.tooltipFnc && typeof options.tooltipFnc === 'function') {
+                            tooltipText = options.tooltipFnc(meta, value);
+                        } else {
+                            meta = '<span class="chartist-tooltip-meta">' + meta + '</span>';
+
+                            if (hasMeta) {
+                                tooltipText += meta + '<br>';
+                            }
+
+                            if (value) {
+                                value = '<span class="chartist-tooltip-value">' + value + '</span>';
+                                tooltipText += value;
+                            }
+                        }
+
+                        if(tooltipText) {
+                            $toolTip.innerHTML = tooltipText;
+                            setPosition(event);
+                            $toolTip.classList.add('show-tooltip');
+                        }
+                    });
+                }
+            */
             let gameWindow = (await (new Promise(resolve => nw.Window.getAll(a => resolve(a))))).find(w => w.window.location.href.match("/index.html")).window;
 
-            Object.defineProperty(window, 'Chartist', {
-                enumerable: false,
-                get: () => Chartist
-            });
-            
             Object.defineProperty(window, 'game', {
                 enumerable: false,
                 get: () => gameWindow.game

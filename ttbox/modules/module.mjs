@@ -3,6 +3,8 @@ export default class TTModule {
     
     static id = 'module';
     static running = false;
+    static hooked = false;
+    static hooks = [];
 
     static async start() {
         console.log(`Starting ${this.id}`);
@@ -11,6 +13,14 @@ export default class TTModule {
 
     static async stop() {
         console.log(`Stopping ${this.id}`);
+
+        this.hooks.forEach(hook => {
+            hook.remove();
+        });
+
+        this.hooked = false;
+        this.hooks = [];
+
         this.running = false;
     }
 

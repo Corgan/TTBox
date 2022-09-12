@@ -118,7 +118,7 @@ export default class UniverseBlock extends StatBlock {
                     classes.push("highest");
                 if(cell.id > 100 && cell.id % 100 == 0)
                     classes.push('spire');
-                if(cell.id <= liqZone && !(cell.id > 100 && cell.id % 100 == 0))
+                if(cell.id <= liqZone && !(cell.id > 100 && cell.id % 100 == 0) && game.global.universe == 1)
                     classes.push('liquid');
                 if(cell.id >= gameWindow.getObsidianStart()) {
                     classes.push('obsidian');

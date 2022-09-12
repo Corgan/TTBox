@@ -11,9 +11,11 @@ export default class TTBox {
     static modules = [
         'blocks',
         'events',
+        'history',
         //'sim',
         //'utils',
-        //'maps',
+        'maps',
+        'saves',
     ];
     static loadedModules = [];
 

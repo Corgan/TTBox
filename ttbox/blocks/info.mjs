@@ -97,7 +97,7 @@ export default class InfoBlock extends StatBlock {
         { id: "ss", name: "SS", fn: () => gameWindow.prettify(gameWindow.playerSpire.spirestones) },
         { id: "avail", name: "Avail He", fn: () => gameWindow.prettify(game.global.totalHeliumEarned - gameWindow.countHeliumSpent(false, true) - game.resources.helium.owned) },
         { id: "magmite", name: "MI", fn: () => game.global.magmite },
-        { id: "c2", name: "C2%", fn: () => game.global.totalSquaredReward },
+        { id: "c2", name: "C2%", fn: () => gameWindow.prettify(game.global.totalSquaredReward) },
         { id: "bones", name: "Bones", fn: () => game.global.b },
         { id: "achieve", name: "Ach%", fn: () => game.global.achievementBonus },
         { id: "fluffy", name: "Fluffy", fn: () => `E${game.global.fluffyPrestige}L${gameWindow.Fluffy.currentLevel} - ${Math.ceil(gameWindow.Fluffy.getExp().slice(1).reduce((a,b) => a/b)*100)}%` },
@@ -238,6 +238,22 @@ export default class InfoBlock extends StatBlock {
                 var remaining = 10 - (timeOnZone % 10);
                 return `${timeOnZone}m (${gameWindow.prettify(remaining)}m)`;
             }
-        }}
+        }},
+        {id: "obsidian", name: "Obsidian Start", fn: () => {
+            return gameWindow.getObsidianStart();
+        }},
+        {id: "tenacity", name: "Tenacity Bonus", fn: () => {
+            return gameWindow.prettify((game.portal.Tenacity.getMult() - 1) * 100);
+        }},
+        {id: "tenacity-time", name: "Tenacity Timer", fn: () => {
+            let time = game.portal.Tenacity.getTime();
+            let timeOnZone = Math.floor(time / 4) * 4;
+            let remaining = Math.floor(time % 4);
+            let seconds = Math.floor((time % 4) * 60);
+            return `${timeOnZone}m (${gameWindow.prettify(remaining)}m${seconds}s)`;
+        }}   ,   
+        {id: "tenacity-carry", name: "Tenacity Carryover", fn: () => {
+            return Math.floor(game.portal.Tenacity.getCarryoverMult());
+        }},
     ]
 }

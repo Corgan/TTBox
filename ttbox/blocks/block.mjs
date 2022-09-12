@@ -110,7 +110,6 @@ export default class StatBlock {
     delete() {
         this.$el.innerHTML = '';
         document.getElementById('content').removeChild(this.$el);
-        this.hooked = false;
         this.hooks.forEach(hook => {
             hook.remove();
         });
@@ -120,6 +119,8 @@ export default class StatBlock {
         this.resizing = false;
         this.configuring = false;
         this.initialized = false;
+        this.hooked = false;
+        this.hooks = [];
     }
     save() {
         let ret = {};
