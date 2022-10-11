@@ -328,7 +328,8 @@ input[type="text"] {
     grid-auto-rows: max-content;
     z-index: 1;
     max-height: 200px;
-    overflow-y: scroll;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
   
 .dropdown-entry {
@@ -339,6 +340,7 @@ input[type="text"] {
     text-decoration: none;
     border: 2px solid #585858;
     box-sizing: border-box;
+    cursor: default;
 }
 
 .dropdown.open > .dropdown-entry,
@@ -858,4 +860,108 @@ input[type="text"] {
 
 .chart .ct-grid {
     stroke: rgba(255, 255, 255, 1);
+}
+
+.chartist-tooltip {
+    position: absolute;
+    display: inline-block;
+    min-width: 50px;
+    opacity: 0;
+    padding: 2px;
+    background: #F4C63D;
+    color: #453D3F;
+    text-align: center;
+    pointer-events: none;
+    z-index: 999;
+}
+
+.chartist-tooltip.show-tooltip {
+    opacity: 1;
+}
+  
+.ct-area, .ct-line {
+    pointer-events: none;
+}
+
+.bmaz-container {
+    display: grid;
+    gap: 10px;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: row;
+}
+
+.bmaz-row {
+    display: grid;
+    gap: 10px;
+    row-gap: 0px;
+    grid-template-areas:'enabled priority condition'
+                        'none none action'
+                        'none none completion';
+    grid-template-columns: 40px 40px 1fr;
+}
+
+.bmaz-variable {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+}
+
+.bmaz-title {
+    font-size: 10px;
+}
+
+.bmaz-condition {
+    grid-area: condition;
+    display: grid;
+    gap: 5px;
+    grid-auto-columns: max-content;
+    grid-auto-flow: column;
+}
+
+.bmaz-action {
+    grid-area: action;
+    display: grid;
+    gap: 5px;
+    grid-auto-columns: max-content;
+    grid-auto-flow: column;
+}
+
+.bmaz-completion {
+    grid-area: completion;
+    display: grid;
+    gap: 5px;
+    grid-auto-columns: max-content;
+    grid-auto-flow: column;
+}
+
+.bmaz-container input {
+    background-color: black;
+}
+
+.bmaz-container .bmaz-text {
+    width: 100px;
+    text-align: right;
+}
+
+.bmaz-container .bmaz-number {
+    width: 40px;
+    text-align: right;
+}
+
+.bmaz-container .bmaz-checkbox {
+    width: 20px;
+    margin: 0;
+    margin-top: 3px;
+}
+
+.bmaz-container .bmaz-dropdown {
+    min-width: 40px;
+}
+
+.bmaz-enabled {
+    grid-area: enabled;
+}
+
+.bmaz-priority {
+    grid-area: priority;
 }

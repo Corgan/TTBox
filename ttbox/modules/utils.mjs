@@ -17,6 +17,10 @@ export default class UtilsModule extends TTModule {
         await super.update(...arguments);
     }
 
+    static get current() {
+        return game.global.mapsActive ? game.global.mapGridArray[game.global.lastClearedMapCell+1] : game.global.gridArray[game.global.lastClearedCell+1];
+    }
+
     static get hze() {
         return game.global.universe == 2 ? game.global.highestRadonLevelCleared : game.global.highestLevelCleared;
     }

@@ -32,9 +32,11 @@ export default class Events extends TTModule {
         document.body.addEventListener('mousemove', Events.handle_mouse_event, true);
         document.body.addEventListener('mousedown', Events.handle_mouse_event, true);
 
-        this.hook(gameWindow, 'startFight', 'fight');
+        this.hook(gameWindow, 'checkMapAtZoneWorld', 'maz');
+        this.hook(gameWindow, 'fight', 'fight');
         this.hook(gameWindow, 'nextWorld', 'world');
         this.hook(gameWindow, 'battle', 'battle');
+        this.hook(gameWindow, 'activatePortal', 'portal');
 
         Events.tt.window.location.reload();
     }

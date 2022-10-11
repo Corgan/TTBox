@@ -243,17 +243,43 @@ export default class InfoBlock extends StatBlock {
             return gameWindow.getObsidianStart();
         }},
         {id: "tenacity", name: "Tenacity Bonus", fn: () => {
-            return gameWindow.prettify((game.portal.Tenacity.getMult() - 1) * 100);
+            return `${gameWindow.prettify((game.portal.Tenacity.getMult() - 1) * 100)}%`;
         }},
         {id: "tenacity-time", name: "Tenacity Timer", fn: () => {
-            let time = game.portal.Tenacity.getTime();
-            let timeOnZone = Math.floor(time / 4) * 4;
-            let remaining = Math.floor(time % 4);
-            let seconds = Math.floor((time % 4) * 60);
-            return `${timeOnZone}m (${gameWindow.prettify(remaining)}m${seconds}s)`;
-        }}   ,   
-        {id: "tenacity-carry", name: "Tenacity Carryover", fn: () => {
-            return Math.floor(game.portal.Tenacity.getCarryoverMult());
+            let zoneTime = gameWindow.getZoneMinutes();
+            let lastZoneTime = game.portal.Tenacity.timeLastZone * game.portal.Tenacity.getCarryoverMult();
+
+            let tenacityMinutes = Math.floor(game.portal.Tenacity.getTime() / 4) * 4;
+
+            let tenacityLastZoneMinutes = Math.floor(game.portal.Tenacity.getTime() % 4);
+            let tenacityLastZoneSeconds = Math.floor((game.portal.Tenacity.getTime() - Math.floor(game.portal.Tenacity.getTime())) * 60);
+
+            return `${tenacityMinutes}m (${gameWindow.formatSecondsAsClock((tenacityLastZoneMinutes * 60) + tenacityLastZoneSeconds, 2)})`;
         }},
+        {id: "tenacity-carryover", name: "Tenacity Carryover", fn: () => {
+            let lastZoneTime = game.portal.Tenacity.timeLastZone * game.portal.Tenacity.getCarryoverMult();
+            let tenacityLastZoneMinutes = Math.floor(lastZoneTime);
+            let tenacityLastZoneSeconds = Math.floor((lastZoneTime - Math.floor(lastZoneTime)) * 60);
+
+            return `${gameWindow.formatSecondsAsClock((tenacityLastZoneMinutes * 60) + tenacityLastZoneSeconds, 1)}`;
+        }},
+        {id: "radortle", name: "Radortle", fn: () => {
+            return `${gameWindow.prettify((gameWindow.Fluffy.getRadortleMult() - 1) * 100)}% (Z${game.global.lastRadonPortal})`;
+        }},
+        {id: "hunger", name: "Hunger", fn: () => {
+            return `${gameWindow.prettify((game.portal.Hunger.getMult() - 1) * 100)}%`;
+        }},
+        {id: "greed", name: "Greed", fn: () => {
+            return `${gameWindow.prettify((game.portal.Greed.getMult() - 1) * 100)}%`;
+        }},
+        {id: "frenzy", name: "Frenzy", fn: () => {
+            return `${game.portal.Frenzy.frenzyTime()} (${game.portal.Frenzy.frenzyLeft()})`;
+        }},
+        {id: "frenzy-chance", name: "Frenzy Chance", fn: () => {
+            return `${gameWindow.prettify((game.portal.Frenzy.radLevel / 1000) * 100)}%`;
+        }},
+        {id: "frenzy-mult", name: "Frenzy Multiplier", fn: () => {
+            return `${gameWindow.prettify((game.portal.Frenzy.getAttackMult() - 1) * 100)}%`;
+        }}
     ]
 }

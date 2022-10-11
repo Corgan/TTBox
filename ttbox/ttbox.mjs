@@ -13,9 +13,10 @@ export default class TTBox {
         'events',
         'history',
         //'sim',
-        //'utils',
+        'utils',
         'maps',
         'saves',
+        'heirlooms'
     ];
     static loadedModules = [];
 
