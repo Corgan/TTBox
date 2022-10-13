@@ -12,9 +12,15 @@ class BMaZVariable {
         Object.defineProperty(this, '$el', { enumerable: false, writable: true, configurable: true });
         Object.defineProperty(this, '_listeners', { enumerable: false, writable: true, value: [] });
 
+        
+
         this.name = name;
         this.key = key;
         this.defaultValue = defaultValue;
+
+        // Let's load any extra params in before setting value, since value getter gets overridden by subclasses
+        Object.entries(args).forEach(([k,v]) => this[k] = v);
+
         this.value = value === undefined ? this.defaultValue : value;
     }
 
@@ -194,26 +200,24 @@ class BMaZTextVariable extends BMaZVariable {
 
 class BMaZDropdownVariable extends BMaZVariable {
     static type = 'dropdown';
-    constructor({options=[], ...args}={}) {
+    constructor({...args}={}) {
         super(args);
-        this.options = options;
     }
 
     get value() { return super.value; }
     set value(value) {
-        if(this.options === undefined) {
-            super.value = value;
-            return;
-        }
-        let option = this.options.find(option => option.value == value);
-        if(this.options.length > 0)
-            super.value = option ? option.value : this.defaultValue;
+        let option = this.options?.find(option => option.value == value)
+        if(!option)
+            option = this.options?.length > 0 ? this.options[0] : { value: this.defaultValue };
+
+        if(super.value != option.value)
+            super.value = option.value;
+        
         if(this.$el) {
             let [ $title, $input ] = this.$el.children;
-            let option = this.options.find(option => option.value == super.value);
 
             $input.children[0].textContent = option.name || option.value;
-            $input.children[0].dataset.id = option.name || option.value;
+            $input.children[0].dataset.id = option.value;
         }
     }
 
@@ -233,7 +237,7 @@ class BMaZDropdownVariable extends BMaZVariable {
                             createElement('div', {
                                 classList: ['dropdown-entry', 'dropdown-current'],
                                 text: option.name || option.value,
-                                attributes: [['data-id', super.value]]
+                                attributes: [['data-id', option.value]]
                             }),
                             createElement('div', {
                                 classList: ['dropdown-content'],
@@ -271,7 +275,7 @@ class BMaZDropdownVariable extends BMaZVariable {
             let option = this.options.find(option => option.value == super.value);
 
             $input.children[0].textContent = option.name || option.value;
-            $input.children[0].dataset.id = option.name || option.value;
+            $input.children[0].dataset.id = option.value;
             this._update = false;
         }
 
@@ -281,6 +285,18 @@ class BMaZDropdownVariable extends BMaZVariable {
 
 class Condition {
     static type = 'default';
+    static registered = new Proxy([], {
+        get(obj, prop) {
+            if(prop in obj)
+                return obj[prop];
+            return obj.find(el => el.type == prop);
+        },
+        set(obj, prop, value) {
+            if(value.prototype instanceof Condition || prop in obj)
+                return Reflect.set(...arguments);
+        }
+    });
+
     constructor({...args}={}) {
         this.variables = new Proxy([], {
             get(obj, prop) {
@@ -299,7 +315,7 @@ class Condition {
             key: 'type',
             value: this.constructor.type,
             defaultValue: 'default',
-            options: Object.entries(BMaZRow.conditions).map(([key,value]) => ({ name: value.display, value: key }))
+            options: Condition.registered.map((value) => ({ name: value.display, value: value.type }))
         }));
     }
 
@@ -343,6 +359,17 @@ class Condition {
 
 class Action {
     static type = 'default';
+    static registered = new Proxy([], {
+        get(obj, prop) {
+            if(prop in obj)
+                return obj[prop];
+            return obj.find(el => el.type == prop);
+        },
+        set(obj, prop, value) {
+            if(value.prototype instanceof Action || prop in obj)
+                return Reflect.set(...arguments);
+        }
+    });
     constructor({...args}={}) {
         this.variables = new Proxy([], {
             get(obj, prop) {
@@ -361,7 +388,7 @@ class Action {
             key: 'type',
             value: this.constructor.type,
             defaultValue: 'default',
-            options: Object.entries(BMaZRow.actions).map(([key,value]) => ({ name: value.display, value: key }))
+            options: Action.registered.map((value) => ({ name: value.display, value: value.type }))
         }));
     }
 
@@ -401,6 +428,17 @@ class Action {
 
 class Completion {
     static type = 'default';
+    static registered = new Proxy([], {
+        get(obj, prop) {
+            if(prop in obj)
+                return obj[prop];
+            return obj.find(el => el.type == prop);
+        },
+        set(obj, prop, value) {
+            if(value.prototype instanceof Completion || prop in obj)
+                return Reflect.set(...arguments);
+        }
+    });
     constructor({...args}={}) {
         this.variables = new Proxy([], {
             get(obj, prop) {
@@ -419,7 +457,7 @@ class Completion {
             key: 'type',
             value: this.constructor.type,
             defaultValue: 'default',
-            options: Object.entries(BMaZRow.completions).map(([key,value]) => ({ name: value.display, value: key }))
+            options: Completion.registered.map((value) => ({ name: value.display, value: value.type }))
         }));
     }
 
@@ -465,6 +503,7 @@ class Completion {
 class StacksCondition extends Condition {
     static type = 'stacks';
     static display = 'Stacks';
+    static { Condition.registered.push(this); }
     constructor({name="", enemy=false, op="equal", amount=0, ...args}={}) {
         super({...args});
         this.variables.push(new BMaZBooleanVariable({ name: 'Enemy', key: 'enemy', value: enemy, defaultValue: false }));
@@ -485,6 +524,7 @@ class StacksCondition extends Condition {
 class WorldCondition extends Condition {
     static type = 'world';
     static display = 'Zone';
+    static { Condition.registered.push(this); }
     constructor({world=game.global.world, through=game.global.world, every=1, ...args}={}) {
         super({...args});
         this.variables.push(new BMaZNumberVariable({ name: 'Zone', key: 'world', value: world, min: 1, defaultValue: 1 }));
@@ -511,6 +551,7 @@ class WorldCondition extends Condition {
 class CellCondition extends WorldCondition {
     static type = 'cell';
     static display = 'Cell';
+    static { Condition.registered.push(this); }
     constructor({cell=game.global.lastClearedCell+2, ...args}={}) {
         super({...args});
         this.variables.push(new BMaZNumberVariable({ name: 'Cell', key: 'cell', value: cell, min: 1, max: 100, defaultValue: 1 }));
@@ -535,10 +576,11 @@ class CellCondition extends WorldCondition {
 
 // Actions
 class MapAction extends Action {
-    static type = 'map';
+    static type = 'cmap';
     static display = 'Run Crafted Map';
 
     static whitelisted = ["Mountain", "Forest", "Sea", "Depths", "Plentiful"];
+    static { Action.registered.push(this); }
 
     constructor({biome="Random", difficulty=0, loot=0, size=0, offset=0, extra=0, specMod="0", perf=false, ...args}={}) {
         super({...args});
@@ -686,8 +728,9 @@ class MapAction extends Action {
 }
 
 class VoidMapAction extends Action {
-    static type = 'void';
+    static type = 'vmap';
     static display = 'Run Void Map';
+    static { Action.registered.push(this); }
 
     constructor({...args}={}) {
         super({...args});
@@ -713,8 +756,9 @@ class VoidMapAction extends Action {
     }
 }
 class BionicMapAction extends Action {
-    static type = 'bionic';
+    static type = 'bwmap';
     static display = 'Run BW';
+    static { Action.registered.push(this); }
 
     constructor({...args}={}) {
         super({...args});
@@ -744,6 +788,7 @@ class BionicMapAction extends Action {
 class ForeverCompletion extends Completion {
     static type = 'forever';
     static display = 'Forever';
+    static { Completion.registered.push(this); }
     constructor({bonus, ...args}={}) {
         super({...args});
     }
@@ -756,6 +801,7 @@ class ForeverCompletion extends Completion {
 class MapRepeatCompletion extends Completion {
     static type = 'maprepeat';
     static display = 'Map Completed';
+    static { Completion.registered.push(this); }
     constructor({repeat, ...args}={}) {
         super({...args});
         this.variables.push(new BMaZNumberVariable({ name: 'Times', key: 'repeat', value: repeat, defaultValue: 10 }));
@@ -793,6 +839,7 @@ class MapRepeatCompletion extends Completion {
 class MapBonusCompletion extends Completion {
     static type = 'mapbonus';
     static display = 'Map Bonus';
+    static { Completion.registered.push(this); }
     constructor({bonus, ...args}={}) {
         super({...args});
         this.variables.push(new BMaZNumberVariable({ name: 'Bonus', key: 'bonus', value: bonus, defaultValue: 10 }));
@@ -807,6 +854,7 @@ class MapBonusCompletion extends Completion {
 class ResourceCompletion extends Completion {
     static type = 'resource';
     static display = 'Resource';
+    static { Completion.registered.push(this); }
     constructor({resource, owned, ...args}={}) {
         super({...args});
         this.variables.push(new BMaZTextVariable({ name: 'Resource', key: 'resource', value: resource, defaultValue: 'food' }));
@@ -821,6 +869,7 @@ class ResourceCompletion extends Completion {
 class BuildingCompletion extends Completion {
     static type = 'building';
     static display = 'Building';
+    static { Completion.registered.push(this); }
     constructor({building, owned, purchased=-1, ...args}={}) {
         super({...args});
         this.variables.push(new BMaZTextVariable({ name: 'Building', key: 'building', value: building, defaultValue: 'Trap' }));
@@ -836,6 +885,7 @@ class BuildingCompletion extends Completion {
 class JobCompletion extends Completion {
     static type = 'job';
     static display = 'Job';
+    static { Completion.registered.push(this); }
     constructor({job, owned, ...args}={}) {
         super({...args});
         this.variables.push(new BMaZTextVariable({ name: 'Job', key: 'job', value: job, defaultValue: 'Farmer' }));
@@ -850,6 +900,7 @@ class JobCompletion extends Completion {
 class UpgradeCompletion extends Completion {
     static type = 'upgrade';
     static display = 'Upgrade';
+    static { Completion.registered.push(this); }
     constructor({upgrade, done, ...args}={}) {
         super({...args});
         this.variables.push(new BMaZTextVariable({ name: 'Upgrade', key: 'upgrade', value: upgrade, defaultValue: 'Dagadder' }));
@@ -864,6 +915,7 @@ class UpgradeCompletion extends Completion {
 class RelicCompletion extends Completion {
     static type = 'relic';
     static display = 'Relic';
+    static { Completion.registered.push(this); }
     constructor({relic, points, ...args}={}) {
         super({...args});
         this.variables.push(new BMaZTextVariable({ name: 'Relic', key: 'relic', value: relic, defaultValue: 'attack' }));
@@ -878,6 +930,7 @@ class RelicCompletion extends Completion {
 class EquipmentCompletion extends Completion {
     static type = 'equipment';
     static display = 'Equipment';
+    static { Completion.registered.push(this); }
     constructor({equipment, level, prestige=-1, ...args}={}) {
         super({...args});
         this.variables.push(new BMaZTextVariable({ name: 'Equipment', key: 'equipment', value: equipment, defaultValue: 'Dagger' }));
@@ -893,29 +946,6 @@ class EquipmentCompletion extends Completion {
 
 // Row
 class BMaZRow {
-    static completions = {
-        forever: ForeverCompletion,
-        maprepeat: MapRepeatCompletion,
-        mapbonus: MapBonusCompletion,
-        resource: ResourceCompletion,
-        building: BuildingCompletion,
-        job: JobCompletion,
-        upgrade: UpgradeCompletion,
-        equipment: EquipmentCompletion,
-    }
-
-    static conditions = {
-        cell: CellCondition,
-        world: WorldCondition,
-        stacks: StacksCondition,
-    }
-
-    static actions = {
-        map: MapAction,
-        bionic: BionicMapAction,
-        void: VoidMapAction,
-    }
-
     constructor({enabled=true, priority=1, condition={type: 'default'}, action={type: 'default'}, completion={type: 'default'}, ...args}) {
         Object.defineProperty(this, '$el', { enumerable: false, writable: true, configurable: true });
         Object.defineProperty(this, '_condition', { enumerable: false, writable: true, configurable: true });
@@ -948,48 +978,48 @@ class BMaZRow {
             defaultValue: true
         }));
         
-        if(Object.keys(this.constructor.conditions).includes(condition.type))
-            this.condition = new this.constructor.conditions[condition.type](condition);
+        if(Condition.registered.find(c => c.type == condition.type))
+            this.condition = new Condition.registered[condition.type](condition);
         else
             this.condition = new Condition(condition);
 
-        if(Object.keys(this.constructor.actions).includes(action.type))
-            this.action = new this.constructor.actions[action.type](action);
+        if(Action.registered.find(a => a.type == action.type))
+            this.action = new Action.registered[action.type](action);
         else
             this.action = new Action(action);
 
-        if(Object.keys(this.constructor.completions).includes(completion.type))
-            this.completion = new this.constructor.completions[completion.type](completion);
+        if(Completion.registered.find(c => c.type == completion.type))
+            this.completion = new Completion.registered[completion.type](completion);
         else
             this.completion = new Completion(completion);
     }
 
     set condition(condition) { this._condition = condition; }
     get condition() {
-        if(this._condition.variables.type.value != this._condition.constructor.type && Object.keys(this.constructor.conditions).includes(this._condition.variables.type.value)) {
+        if(this._condition.variables.type.value != this._condition.constructor.type && Condition.registered.find(c => c.type == this._condition.variables.type.value)) {
             let type = this._condition.variables.type.value;
             this._condition.remove();
-            this._condition = new this.constructor.conditions[type]();
+            this._condition = new Condition.registered[type]();
         }
         return this._condition;
     }
 
     set action(action) { this._action = action; }
     get action() {
-        if(this._action.variables.type.value != this._action.constructor.type && Object.keys(this.constructor.actions).includes(this._action.variables.type.value)) {
+        if(this._action.variables.type.value != this._action.constructor.type && Action.registered.find(c => c.type == this._action.variables.type.value)) {
             let type = this._action.variables.type.value;
             this._action.remove();
-            this._action = new this.constructor.actions[type]();
+            this._action = new Action.registered[type]();
         }
         return this._action;
     }
 
     set completion(completion) { this._completion = completion; }
     get completion() {
-        if(this._completion.variables.type.value != this._completion.constructor.type && Object.keys(this.constructor.completions).includes(this._completion.variables.type.value)) {
+        if(this._completion.variables.type.value != this._completion.constructor.type && Completion.registered.find(c => c.type == this._completion.variables.type.value)) {
             let type = this._completion.variables.type.value;
             this._completion.remove();
-            this._completion = new this.constructor.completions[type]();
+            this._completion = new Completion.registered[type]();
         }
         return this._completion;
     }
